@@ -3,7 +3,7 @@ package com.musala.simple.smarthome.devices;
 import com.musala.simple.smarthome.ISmartDevice;
 
 /**
- * Motion detection implementation of the @ISmartDevice interface.
+ * Motion detection implementation of the {@link ISmartDevice}. interface.
  * The device can perform a specific action by overriding the 
  * performAction() method.
  * 
