@@ -7,11 +7,6 @@
   <artifactId>musala-training</artifactId>
   <version>1.0</version>
   <build>
-    <resources>
-      <resource>
-        <directory>com.musala.simple.smarthome</directory>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
