@@ -9,5 +9,5 @@ package com.musala.simple.students;
 *
 */
 public class StudentWrapper {
-	Student[] students;
+	public Student[] students;
 }

@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.musala.simple.students.exception.InvalidStudentIdException;
+import com.musala.simple.students.internal.ErrorMessage;
+
 /**
  * The class {@code StudentGroup} groups together a certain amount 
  * of {@link Student} objects and provides the user with
@@ -61,11 +64,33 @@ public class StudentGroup {
 	 * @return student   A Student object from the {@link StudentGroup#students}
 	 * 					 corresponding to the provided id
 	 */
-	public Student getStudentById (int id) {
+	public Student getStudentById (int id) throws InvalidStudentIdException {
+		if (id < 0) {
+			throw new InvalidStudentIdException(ErrorMessage.NEGATIVE_ID);
+		}
 		if (!this.students.containsKey(id)) { 
-			throw new IllegalArgumentException("A student with the given ID does not exist.");
+			throw new InvalidStudentIdException(ErrorMessage.STUDENT_NOT_EXISTS);
 		}
 		
 		return this.students.get(id);
+	}
+	
+	/**
+	 * An overload of the {@link StudentGroup#getStudentById(int)} method, which takes 
+	 * String as an argument and try-parses it to Integer, before calling  the 
+	 * {@link StudentGroup#getStudentById(int)}.
+	 *
+	 * @param  String id Id of the user being requested
+	 * @return student   A Student object from the {@link StudentGroup#students}
+	 * 					 corresponding to the provided id
+	 */
+	public Student getStudentById (String id) throws InvalidStudentIdException {
+		try {
+			Integer.parseInt(id);
+		} catch (NumberFormatException e) {
+			throw new InvalidStudentIdException(ErrorMessage.INVALID_ID_FORMAT);
+		}
+		
+		return getStudentById(Integer.parseInt(id));
 	}
 }

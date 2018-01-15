@@ -1,6 +1,8 @@
 package com.musala.simple.students;
 
 /**
+ * The class represents a blueprint for storing data about a student - id, name,
+ * age and grade.
  * 
  * @author yoan.petrushinov
  *
@@ -10,8 +12,8 @@ public class Student {
 	private String name;
 	private int age;
 	private int grade;
-	
-	public Student (int id, String name, int age, int grade) {
+
+	public Student(int id, String name, int age, int grade) {
 		this.setId(id);
 		this.setName(name);
 		this.setAge(age);
