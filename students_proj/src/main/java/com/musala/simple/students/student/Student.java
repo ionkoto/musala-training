@@ -1,4 +1,4 @@
-package com.musala.simple.students;
+package com.musala.simple.students.student;
 
 /**
  * The class represents a blueprint for storing data about a student - id, name,

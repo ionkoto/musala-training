@@ -1,4 +1,4 @@
-package com.musala.simple.students;
+package com.musala.simple.students.helpers;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,9 +10,13 @@ import java.nio.file.Paths;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import com.google.gson.Gson;
+import com.musala.simple.students.Main;
 import com.musala.simple.students.internal.ErrorMessage;
 import com.musala.simple.students.internal.InfoMessage;
 import com.musala.simple.students.internal.PathConstants;
+import com.musala.simple.students.student.Student;
+import com.musala.simple.students.student.StudentGroup;
+import com.musala.simple.students.student.StudentWrapper;
 
 /**
  * This is a helper class providing methods for creating, reading and updating
@@ -21,7 +25,7 @@ import com.musala.simple.students.internal.PathConstants;
  * @author yoan.petrushinov
  * 
  */
-class FileHelper {
+public class FileHelper {
 	private FileHelper() {
 		
 	}
@@ -46,7 +50,7 @@ class FileHelper {
 	 * Reads the backup Json file (if exists) and prints the students information
 	 * from it.
 	 */
-	static StudentWrapper readBackupJson() throws ResourceDoesNotExistException {
+	public static StudentWrapper readBackupJson() throws ResourceDoesNotExistException {
 		File backupFile = new File(PathConstants.BACKUP_JSON);
 
 		if (!backupFile.exists()) {
@@ -66,7 +70,7 @@ class FileHelper {
 	 *            A Json String, containing the students to be added to the backup
 	 *            file.
 	 */
-	static void updateBackupJson(String studentsJsonInfo) {
+	public static void updateBackupJson(String studentsJsonInfo) {
 		File backupFile = new File(PathConstants.BACKUP_JSON);
 
 		if (!backupFile.exists()) {
@@ -97,7 +101,7 @@ class FileHelper {
 	 *            a valid path to a file's location
 	 * @return the content of the file that has been read
 	 */
-	static String readFile(String path) {
+	public static String readFile(String path) {
 		try {
 			return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
 		} catch (IOException e) {

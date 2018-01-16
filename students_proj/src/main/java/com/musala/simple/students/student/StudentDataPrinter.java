@@ -1,4 +1,4 @@
-package com.musala.simple.students;
+package com.musala.simple.students.student;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * @author yoan.petrushinov
  *
  */
-class StudentDataPrinter {
+public class StudentDataPrinter {
 	/**
 	 * Outputs on the console the details of a given {@link Student} objects in a
 	 * specified format containing their Id, Name, Age and Grade properties.
@@ -19,7 +19,7 @@ class StudentDataPrinter {
 	 * @param student
 	 *            A {@link Student} object, whose details are being printed.
 	 */
-	static void printStudentDetails(Student student) {
+	public static void printStudentDetails(Student student) {
 		StringBuilder outputSb = new StringBuilder();
 		outputSb.append(String.format("%-3s %-20s %-5s %-5s", "Id", "Name", "Age", "Grade"))
 				.append(System.lineSeparator()).append(String.format("%-3d %-20s %-5d %-5d", student.getId(),
@@ -35,7 +35,7 @@ class StudentDataPrinter {
 	 * @param students
 	 *            A List containing {@link Student} objects
 	 */
-	static void printStudents(List<Student> studentsList) {
+	public static void printStudents(List<Student> studentsList) {
 		StringBuilder outputSb = new StringBuilder();
 		outputSb.append("Student group: ").append(System.lineSeparator()).append(System.lineSeparator())
 				.append(String.format("%-3s %-20s %-5s %-5s", "Id", "Name", "Age", "Grade"))
@@ -55,7 +55,7 @@ class StudentDataPrinter {
 	 *
 	 * @param studentsArr An Array containing {@link Student} objects
 	 */
-	static void printStudents(Student[] studentsArr) {
+	public static void printStudents(Student[] studentsArr) {
 		printStudents(Arrays.asList(studentsArr));
 	}
 }

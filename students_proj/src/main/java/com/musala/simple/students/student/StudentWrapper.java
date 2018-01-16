@@ -1,4 +1,4 @@
-package com.musala.simple.students;
+package com.musala.simple.students.student;
 
 /**
 * This is a helper class used to parse a JSON array of students.
@@ -9,5 +9,5 @@ package com.musala.simple.students;
 *
 */
 public class StudentWrapper {
-	Student[] students;
+	public Student[] students;
 }

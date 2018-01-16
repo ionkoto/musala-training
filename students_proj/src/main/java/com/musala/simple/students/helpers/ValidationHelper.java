@@ -1,4 +1,4 @@
-package com.musala.simple.students;
+package com.musala.simple.students.helpers;
 
 import java.io.File;
 
@@ -13,7 +13,7 @@ import com.musala.simple.students.internal.ErrorMessage;
  * @author yoan.petrushinov
  * 
  */
-class ValidationHelper {
+public class ValidationHelper {
 	private ValidationHelper() {
 		
 	}
@@ -28,7 +28,7 @@ class ValidationHelper {
 	 * @return true if the first argument in the array is a valid path to a file
 	 *         with extension ".json".
 	 */
-	static boolean isInputValid(String[] args) {
+	public static boolean isInputValid(String[] args) {
 
 		/* Check if any arguments are provided */
 		if (args.length == 0) {
@@ -56,6 +56,7 @@ class ValidationHelper {
 		/* Check the file extension to be JSON. */
 		if (!argPath.endsWith(JSON_FILE_EXTENSION)) {
 			System.err.println(ErrorMessage.FILE_NOT_JSON);
+			
 			return false;
 		}
 
@@ -71,7 +72,7 @@ class ValidationHelper {
 	 *            A String that the user wants to validate as JSON
 	 * @return validation of weather the given String is a valid JSON
 	 */
-	static boolean isValidJson(String Json) {
+	public static boolean isValidJson(String Json) {
 		if (Json.equals(null)) {
 			return false;
 		}

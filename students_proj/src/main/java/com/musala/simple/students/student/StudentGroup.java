@@ -1,4 +1,4 @@
-package com.musala.simple.students;
+package com.musala.simple.students.student;
 
 import java.util.Collections;
 import java.util.HashMap;
