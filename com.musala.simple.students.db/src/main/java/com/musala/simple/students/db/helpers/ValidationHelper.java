@@ -83,6 +83,18 @@ public class ValidationHelper {
 		}
 	}
 
+	/**
+	 * Validates a request for a specific user's details. If no second
+	 * argument is provided to the command line it returns false - no request 
+	 * was made at all. If a second argument was provided, but it can't be cast
+	 * to a valid integer the method throws an exception. If the id is a valid 
+	 * integer but negative, the method throws an exception. If all validations
+	 * are passed the method returns true, else it returns false.
+	 *
+	 * @param args String array of command line passed arguments
+	 * @return validRequest a boolean value to validate the request (true = valid,
+	 * false = invalid).
+	 */
 	public static boolean validRequest(String[] args) {
 		if (args.length < 2) {
 			return false;

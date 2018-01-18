@@ -2,7 +2,7 @@ package com.musala.simple.students.db.exception;
 
 /**
  * This is a custom exception class. The user can throw
- * this exception, when a studente object can't be found
+ * this exception, when a student object can't be found
  * when looked for in a Student Group or Database
  * 
  * @author yoan.petrushinov

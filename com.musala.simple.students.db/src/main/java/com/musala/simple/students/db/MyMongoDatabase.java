@@ -22,6 +22,12 @@ import com.musala.simple.students.db.internal.ErrorMessage;
 import com.musala.simple.students.db.internal.InfoMessage;
 import com.musala.simple.students.db.student.Student;
 
+/**
+ * MongoDb implementation of the {@link Database} interface.
+ * 
+ * @author yoan.petrushinov
+ *
+ */
 public class MyMongoDatabase implements Database {
 	private MongoClient mongo;
 	private MongoDatabase database;
@@ -38,6 +44,12 @@ public class MyMongoDatabase implements Database {
 		this.setStudentsCollection();
 	}
 
+	/**
+	 * 
+	 * @param host
+	 *            the hostname for establishing databse connection port the port
+	 *            number for the db connection
+	 */
 	private void setMongoClient(String host, int port) {
 		this.mongo = new MongoClient(host, port);
 		logger.info(InfoMessage.DATABASE_CONNECTION_SUCCESS);
@@ -47,28 +59,63 @@ public class MyMongoDatabase implements Database {
 		return this.mongo;
 	}
 
+	/**
+	 * @return dbName the name of the current database being initialized
+	 */
 	private String getDbName() {
 		return dbName;
 	}
 
+	/**
+	 * 
+	 * @param dbName
+	 *            name of the database being initialized
+	 */
 	private void setDbName(String dbName) {
 		this.dbName = dbName;
 	}
 
+	/**
+	 * @return the {@link MongoDatabase} property
+	 */
 	private MongoDatabase getDatabase() {
 		return database;
 	}
 
+	/**
+	 * sets the {@link MyMongoDatabase#database} parameter
+	 */
 	private void setDatabase() {
 		this.database = this.getMongoClient().getDatabase(this.getDbName());
 	}
 
+	/**
+	 * initializes a collection of student {@link Document}s and sets the id
+	 * property as a unique property. This prevents from creating multiple documents
+	 * in the collection with the same student id. Notice that the unique index is
+	 * set for the id property of the student object and not the auto-generated
+	 * "_id" property of the {@link Document}. If the collection does not exist it's
+	 * being automatically created.
+	 */
 	private void setStudentsCollection() {
 		Document index = new Document("id", 1);
 		this.studentsCollection = this.getDatabase().getCollection("students");
 		this.studentsCollection.createIndex(index, new IndexOptions().unique(true));
 	}
 
+	/**
+	 * A MongoDb-specific implementation of the {@link Database#addStudent(Student)}
+	 * method. Extracts the properties of the {@link Student} object as an array of
+	 * Fields and then initializes a {@link Document} object to be added to the
+	 * collection (the MongoDb collection only accepts {@link Document} objects. The
+	 * method then iterates over the Fields array and assigns the Student's
+	 * properties to the Document object. The document object is then inserted to
+	 * the collection using a try-catch block in case a document containing the same
+	 * student id is already in the database. The
+	 * {@link MyMongoDatabase#setStudentsCollection} method specifies that the id
+	 * property must be unique.
+	 * 
+	 */
 	@Override
 	public void addStudent(Student student) {
 		Field[] fields = Student.class.getDeclaredFields();
@@ -104,6 +151,16 @@ public class MyMongoDatabase implements Database {
 
 	}
 
+	/**
+	 * A MongoDb-specific implementation of the {@link Database#getStudentById()}
+	 * method. Searches the database for a document with an id property value equal
+	 * to the studentId param. If not found the method throws an exception. Else it
+	 * creates a student object with the required properties and returns it.
+	 * 
+	 * @param studentId
+	 *            the id to find a student in the database
+	 * @return a Student object with id, name, age and grade
+	 */
 	@Override
 	public Student getStudentById(int studentId) throws StudentNotFoundException {
 		Document query = new Document("id", studentId);
@@ -122,6 +179,16 @@ public class MyMongoDatabase implements Database {
 		return new Student(id, name, age, grade);
 	}
 
+	/**
+	 * A MongoDb-specific implementation of the {@link Database#getAllStudentsArr()}
+	 * method. Retrieves the collection of {@link Document}s from the database, adds
+	 * the values of each document to a list and then assigns each value to the
+	 * corresponding property of a newly created Student objects. It then adds that
+	 * object to a List. After adding all the students to the list the method
+	 * returns an array from that list.
+	 * 
+	 * @return a Student[] array
+	 */
 	@Override
 	public Student[] getAllStudentsArr() {
 		List<Student> studentsList = new ArrayList<>();
@@ -143,11 +210,29 @@ public class MyMongoDatabase implements Database {
 		return studentsList.toArray(new Student[studentsList.size()]);
 	}
 
+	/**
+	 * A MongoDb-specific implementation of the
+	 * {@link Database#getAllStudentsList()} method. Calls the
+	 * {@link MyMongoDatabase#getAllStudentsArr()} and casts the returned array to a
+	 * List<Student> and returns it.
+	 * 
+	 * @return a List<Student> all students in a List
+	 */
 	@Override
 	public List<Student> getAllStudentsList() {
 		return Arrays.asList(this.getAllStudentsArr());
 	}
 
+	/**
+	 * A MongoDb-specific implementation of the
+	 * {@link Database#addMultipleStudents(List<Student> students)} method. Iterates
+	 * over the List<Student> parameter and calls the
+	 * {@link Database#addStudent(Student)} method for each Student object.
+	 * 
+	 * @param students
+	 *            a List containing multiple {@link Student} objects to be added to
+	 *            the database
+	 */
 	@Override
 	public void addMultipleStudents(List<Student> students) {
 		for (Student student : students) {
@@ -155,6 +240,16 @@ public class MyMongoDatabase implements Database {
 		}
 	}
 
+	/**
+	 * A MongoDb-specific implementation of the
+	 * {@link Database#addMultipleStudents(Student[] students)} method. Iterates
+	 * over the Student[] parameter and calls the
+	 * {@link Database#addStudent(Student)} method for each Student object.
+	 * 
+	 * @param students
+	 *            an Array containing multiple {@link Student} objects to be added
+	 *            to the database
+	 */
 	@Override
 	public void addMultipleStudents(Student[] students) {
 		List<Student> studentsList = Arrays.asList(students);
