@@ -14,7 +14,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
-import com.musala.simple.students.db.database.Database;
+import com.musala.simple.students.db.database.AbstractDatabase;
 import com.musala.simple.students.db.database.DatabaseCommands;
 import com.musala.simple.students.db.database.DatabaseProperties;
 import com.musala.simple.students.db.exception.StudentNotFoundException;
@@ -28,8 +28,13 @@ import com.musala.simple.students.db.student.Student;
  * @author yoan.petrushinov
  *
  */
-public class MyMongoDatabase extends Database implements DatabaseCommands, DatabaseProperties {
-	private MongoClient mongo;
+public class MyMongoDatabase extends AbstractDatabase implements DatabaseCommands, DatabaseProperties {
+	private static final String DB_DUPLICATE_ENTRY_ATTEMPT_ERROR_ID = "E11000";
+	private static final String STUDEND_ADD_FAIL_DUPLICATE_ID = "Student %s with id %d can not be added to the database. Student with the same id already exists\n";
+	private static final String STUDENT_ADD_FAIL = "Problem occured while trying to add %s with id %d to the database.\n";
+	private static final String UNIQUE_IDENTIFIER = "id";
+	private static final String STUDENT_COLLECTION_NAME = "students";
+	private MongoClient mongoClient;
 	private MongoDatabase database;
 	private MongoCollection<Document> studentsCollection;
 
@@ -40,7 +45,7 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 		this.setStudentsCollection();
 		getLogger().info(InfoMessage.DATABASE_CONNECTION_SUCCESS);
 	}
-	
+
 	/**
 	 * 
 	 * @param host
@@ -48,11 +53,11 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 	 *            number for the database connection
 	 */
 	private void setMongoClient() {
-		this.mongo = new MongoClient(this.getHost(), this.getPort());
+		this.mongoClient = new MongoClient(this.getHost(), this.getPort());
 	}
 
 	private MongoClient getMongoClient() {
-		return this.mongo;
+		return this.mongoClient;
 	}
 
 	/**
@@ -78,22 +83,22 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 	 * being automatically created.
 	 */
 	private void setStudentsCollection() {
-		Document index = new Document("id", 1);
-		this.studentsCollection = this.getDatabase().getCollection("students");
+		Document index = new Document(UNIQUE_IDENTIFIER, 1);
+		this.studentsCollection = this.getDatabase().getCollection(STUDENT_COLLECTION_NAME);
 		this.studentsCollection.createIndex(index, new IndexOptions().unique(true));
 	}
 
 	/**
-	 * A MongoDb-specific implementation of the {@link DatabaseCommands#addStudent(Student)}
-	 * method. Extracts the properties of the {@link Student} object as an array of
-	 * Fields and then initializes a {@link Document} object to be added to the
-	 * collection (the MongoDb collection only accepts {@link Document} objects. The
-	 * method then iterates over the Fields array and assigns the Student's
-	 * properties to the Document object. The document object is then inserted to
-	 * the collection using a try-catch block in case a document containing the same
-	 * student id is already in the database. The
-	 * {@link MyMongoDatabase#setStudentsCollection} method specifies that the id
-	 * property must be unique.
+	 * A MongoDb-specific implementation of the
+	 * {@link AbstractDatabase#addStudent(Student)} method. Extracts the properties
+	 * of the {@link Student} object as an array of Fields and then initializes a
+	 * {@link Document} object to be added to the collection (the MongoDb collection
+	 * only accepts {@link Document} objects. The method then iterates over the
+	 * Fields array and assigns the Student's properties to the Document object. The
+	 * document object is then inserted to the collection using a try-catch block in
+	 * case a document containing the same student id is already in the database.
+	 * The {@link MyMongoDatabase#setStudentsCollection} method specifies that the
+	 * id property must be unique.
 	 * 
 	 */
 	@Override
@@ -106,21 +111,17 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 			try {
 				newStudent.append(fieldName, field.get(student));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				getLogger().error(String.format("An error occured while trying to add student with name %s to the database.",
-						student.getName()));
+				getLogger().error(String.format(STUDENT_ADD_FAIL, student.getName(), student.getId()));
 				getLogger().info("Stacktrace:", e);
 			}
 		}
 		try {
 			this.studentsCollection.insertOne(newStudent);
 		} catch (MongoWriteException e) {
-			if (e.getMessage().startsWith("E11000")) {
-				getLogger().error(String.format(
-						"Student %s with id %d can not be added to the DatabaseCommands. Student with the same id already exists\n",
-						student.getName(), student.getId()));
+			if (e.getMessage().startsWith(DB_DUPLICATE_ENTRY_ATTEMPT_ERROR_ID)) {
+				getLogger().error(String.format(STUDEND_ADD_FAIL_DUPLICATE_ID, student.getName(), student.getId()));
 			} else {
-				getLogger().error(String.format("Problem occured while trying to add %s with id %d to the database.\n",
-						student.getName(), student.getId()));
+				getLogger().error(String.format(STUDENT_ADD_FAIL, student.getName(), student.getId()));
 				getLogger().error("Stacktrace:", e);
 			}
 		}
@@ -128,7 +129,7 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 
 	@Override
 	public void deleteStudentById(int studentId) throws StudentNotFoundException {
-		Document query = new Document("id", studentId);
+		Document query = new Document(UNIQUE_IDENTIFIER, studentId);
 		query = this.studentsCollection.find(query).first();
 
 		if (query == null) {
@@ -140,10 +141,11 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 	}
 
 	/**
-	 * A MongoDb-specific implementation of the {@link DatabaseCommands#getStudentById()}
-	 * method. Searches the database for a document with an id property value equal
-	 * to the studentId param. If not found the method throws an exception. Else it
-	 * creates a student object with the required properties and returns it.
+	 * A MongoDb-specific implementation of the
+	 * {@link AbstractDatabase#getStudentById()} method. Searches the database for a
+	 * document with an id property value equal to the studentId param. If not found
+	 * the method throws an exception. Else it creates a student object with the
+	 * required properties and returns it.
 	 * 
 	 * @param studentId
 	 *            the id to find a student in the database
@@ -151,7 +153,7 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 	 */
 	@Override
 	public Student getStudentById(int studentId) throws StudentNotFoundException {
-		Document query = new Document("id", studentId);
+		Document query = new Document(UNIQUE_IDENTIFIER, studentId);
 		query = this.studentsCollection.find(query).first();
 
 		if (query == null) {
@@ -162,11 +164,12 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 	}
 
 	/**
-	 * Creates a list of the Document's values and constructs
-	 * a student object with the extracted from the document
-	 * properties.
-	 * @param query The Document containing the Student's information in a
-	 * 		  database format.
+	 * Creates a list of the Document's values and constructs a student object with
+	 * the extracted from the document properties.
+	 * 
+	 * @param query
+	 *            The Document containing the Student's information in a database
+	 *            format.
 	 * @return the new Student object
 	 */
 	private Student constructStudentObject(Document query) {
@@ -180,12 +183,12 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 	}
 
 	/**
-	 * A MongoDb-specific implementation of the {@link DatabaseCommands#getAllStudentsArr()}
-	 * method. Retrieves the collection of {@link Document}s from the database, adds
-	 * the values of each document to a list and then assigns each value to the
-	 * corresponding property of a newly created Student objects. It then adds that
-	 * object to a List. After adding all the students to the list the method
-	 * returns an array from that list.
+	 * A MongoDb-specific implementation of the
+	 * {@link AbstractDatabase#getAllStudentsArr()} method. Retrieves the collection
+	 * of {@link Document}s from the database, adds the values of each document to a
+	 * list and then assigns each value to the corresponding property of a newly
+	 * created Student objects. It then adds that object to a List. After adding all
+	 * the students to the list the method returns an array from that list.
 	 * 
 	 * @return a Student[] array
 	 */
@@ -206,7 +209,7 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 
 	/**
 	 * A MongoDb-specific implementation of the
-	 * {@link DatabaseCommands#getAllStudentsList()} method. Calls the
+	 * {@link AbstractDatabase#getAllStudentsList()} method. Calls the
 	 * {@link MyMongoDatabase#getAllStudentsArr()} and casts the returned array to a
 	 * List<Student> and returns it.
 	 * 
@@ -219,9 +222,9 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 
 	/**
 	 * A MongoDb-specific implementation of the
-	 * {@link DatabaseCommands#addMultipleStudents(List<Student> students)} method. Iterates
-	 * over the List<Student> parameter and calls the
-	 * {@link DatabaseCommands#addStudent(Student)} method for each Student object.
+	 * {@link AbstractDatabase#addMultipleStudents(List<Student> students)} method.
+	 * Iterates over the List<Student> parameter and calls the
+	 * {@link AbstractDatabase#addStudent(Student)} method for each Student object.
 	 * 
 	 * @param students
 	 *            a List containing multiple {@link Student} objects to be added to
@@ -236,9 +239,9 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 
 	/**
 	 * A MongoDb-specific implementation of the
-	 * {@link DatabaseCommands#addMultipleStudents(Student[] students)} method. Iterates
-	 * over the Student[] parameter and calls the
-	 * {@link DatabaseCommands#addStudent(Student)} method for each Student object.
+	 * {@link AbstractDatabase#addMultipleStudents(Student[] students)} method.
+	 * Iterates over the Student[] parameter and calls the
+	 * {@link AbstractDatabase#addStudent(Student)} method for each Student object.
 	 * 
 	 * @param students
 	 *            an Array containing multiple {@link Student} objects to be added
@@ -249,6 +252,4 @@ public class MyMongoDatabase extends Database implements DatabaseCommands, Datab
 		List<Student> studentsList = Arrays.asList(students);
 		this.addMultipleStudents(studentsList);
 	}
-
-	
 }

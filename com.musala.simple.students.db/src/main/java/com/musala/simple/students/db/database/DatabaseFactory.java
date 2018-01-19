@@ -5,14 +5,14 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.musala.simple.students.db.database.DatabaseTypes;
 import com.musala.simple.students.db.database.impl.MyMongoDatabase;
+import com.musala.simple.students.db.internal.InfoMessage;
 
 /**
  * This is a Factory class for creating {@link DatabaseCommands} objects. The
  * constructor requires the database properties to be provided in the form of a
  * {@link Properties} object passed to the constructor along with the database
- * type {@link DatabaseTypes} enum.
+ * type {@link DatabaseType} enum.
  * 
  * 
  * @author yoan.petrushinov
@@ -21,21 +21,23 @@ import com.musala.simple.students.db.database.impl.MyMongoDatabase;
 public class DatabaseFactory {
 	private static final int DEFAULT_DB_PORT_INT = 27017;
 
-	private Database database;
+	private AbstractDatabase database;
 	
 	private static Logger logger = LoggerFactory.getLogger(DatabaseFactory.class);
 	
-	public DatabaseFactory (Database database) {
+	public DatabaseFactory (AbstractDatabase database) {
 		this.database = database;
 	}
 
 	/**
-	 * Creates a new implementation of the {@link DatabaseCommands}.
+	 * Instantiates a new database implementation according to the dbType
+	 * provided and passes that implementation to the DatabaseFactory constructor.
 	 * 
-	 * @return a new database of the required type
+	 * @param dbType the type of the database being created
+	 * @return a call to the DatabaseFactory constructor
 	 */
-	public static DatabaseFactory createDatabase(DatabaseTypes dbType) {
-		Database database = null;
+	public static DatabaseFactory createDatabase(DatabaseType dbType) {
+		AbstractDatabase database = null;
 		switch (dbType) {
 			case MySQL:
 				// TODO
@@ -47,6 +49,7 @@ public class DatabaseFactory {
 				// TODO
 				break;
 			default:
+				logger.info(InfoMessage.DEFAULT_DATABASE_INITIALIZATION);
 				database = new MyMongoDatabase();
 				break;
 		}
@@ -109,7 +112,11 @@ public class DatabaseFactory {
 		return this;
 	}
 
-	public Database build() {
+	/**
+	 * 
+	 * @return the current database instance
+	 */
+	public AbstractDatabase build() {
 		return this.database;
 	}
 }

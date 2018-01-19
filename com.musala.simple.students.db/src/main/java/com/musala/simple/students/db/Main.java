@@ -10,12 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.musala.simple.students.db.database.Database;
+import com.musala.simple.students.db.database.AbstractDatabase;
 import com.musala.simple.students.db.database.DatabaseFactory;
-import com.musala.simple.students.db.database.DatabaseTypes;
+import com.musala.simple.students.db.database.DatabaseType;
 import com.musala.simple.students.db.exception.StudentNotFoundException;
-import com.musala.simple.students.db.helpers.FileHelper;
-import com.musala.simple.students.db.helpers.ValidationHelper;
+import com.musala.simple.students.db.helper.FileHelper;
+import com.musala.simple.students.db.helper.ValidationHelper;
 import com.musala.simple.students.db.internal.ErrorMessage;
 import com.musala.simple.students.db.student.Student;
 import com.musala.simple.students.db.student.StudentDataPrinter;
@@ -43,8 +43,8 @@ public class Main {
 		 * http://www.codejava.net/coding/how-to-configure-log4j-as-logging-mechanism-in-java */
 		BasicConfigurator.configure();
 
-		Properties dbProperties = FileHelper.readDbPropertiesFile(DatabaseTypes.MongoDb);
-		Database database = DatabaseFactory.createDatabase(DatabaseTypes.MongoDb)
+		Properties dbProperties = FileHelper.readDbPropertiesFile(DatabaseType.MongoDb);
+		AbstractDatabase database = DatabaseFactory.createDatabase(DatabaseType.MongoDb)
 				.withName(dbProperties.getProperty(DB_NAME, DEFAULT_DB_NAME))
 				.withHost(dbProperties.getProperty(DB_HOST, DEFAULT_DB_HOST))
 				.withPort(dbProperties.getProperty(DB_PORT, DEFAULT_DB_PORT))

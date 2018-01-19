@@ -8,8 +8,8 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import com.google.gson.Gson;
 import com.musala.simple.students.exception.InvalidStudentIdException;
-import com.musala.simple.students.helpers.FileHelper;
-import com.musala.simple.students.helpers.ValidationHelper;
+import com.musala.simple.students.helper.FileHelper;
+import com.musala.simple.students.helper.ValidationHelper;
 import com.musala.simple.students.internal.ErrorMessage;
 import com.musala.simple.students.student.Student;
 import com.musala.simple.students.student.StudentDataPrinter;

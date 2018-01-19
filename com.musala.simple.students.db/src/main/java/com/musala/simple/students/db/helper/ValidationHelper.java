@@ -1,4 +1,4 @@
-package com.musala.simple.students.db.helpers;
+package com.musala.simple.students.db.helper;
 
 import java.io.File;
 

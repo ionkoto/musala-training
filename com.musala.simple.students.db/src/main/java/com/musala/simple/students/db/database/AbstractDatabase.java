@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.musala.simple.students.db.exception.StudentNotFoundException;
 import com.musala.simple.students.db.student.Student;
 
-public abstract class Database implements DatabaseCommands, DatabaseProperties {
+public abstract class AbstractDatabase implements DatabaseCommands, DatabaseProperties {
 	private String name;
 	private String host;
 	private int port;
@@ -66,10 +66,21 @@ public abstract class Database implements DatabaseCommands, DatabaseProperties {
 		return this.password;
 	}
 
+	/**
+	 * Gives the user a {@link Logger} instance for logging
+	 * messages.
+	 *
+	 * @return the Logger instance
+	 */
 	protected Logger getLogger() {
 		return this.logger;
 	}
 	
+	/**
+	 * Abstract method for the user to initialize database connection
+	 * after creating a new {@link AbstractDatabase} implementation instance.
+	 *
+	 */
 	public abstract void establishConnection();
 	
 	@Override

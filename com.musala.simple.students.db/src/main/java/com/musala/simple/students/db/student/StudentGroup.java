@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.musala.simple.students.db.Main;
-import com.musala.simple.students.db.exception.InvalidStudentIdException;
 import com.musala.simple.students.db.exception.StudentNotFoundException;
 import com.musala.simple.students.db.internal.ErrorMessage;
 

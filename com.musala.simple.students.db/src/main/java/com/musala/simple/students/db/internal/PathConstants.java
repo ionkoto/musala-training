@@ -8,7 +8,7 @@ package com.musala.simple.students.db.internal;
  *
  */
 public class PathConstants {
-	public static final String MONGODB_PROPS_PATH = "src/main/resources/mongodbConfig.properties";
+	public static final String MONGODB_PROPS_PATH = "/mongodbConfig.properties";
 	
 	private PathConstants() {
 		

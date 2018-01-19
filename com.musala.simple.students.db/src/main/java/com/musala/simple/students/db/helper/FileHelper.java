@@ -1,17 +1,16 @@
-package com.musala.simple.students.db.helpers;
+package com.musala.simple.students.db.helper;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
-import org.slf4j.Logger;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.musala.simple.students.db.Main;
-import com.musala.simple.students.db.database.DatabaseTypes;
+import com.musala.simple.students.db.database.DatabaseType;
 import com.musala.simple.students.db.internal.PathConstants;
 
 /**
@@ -22,6 +21,8 @@ import com.musala.simple.students.db.internal.PathConstants;
  * 
  */
 public class FileHelper {
+	private static final String DB_CONFIG_READ_ERROR = "An error occured while trying to read the database config file: %s";
+	private static final String READ_FILE_ERROR = "Caught an exception while reading file from path %s:\n";
 	private static Logger logger = LoggerFactory.getLogger(FileHelper.class);
 
 	private FileHelper() {
@@ -41,7 +42,7 @@ public class FileHelper {
 		try {
 			return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			logger.error(String.format("Caught an exception while reading file from path %s:\n", path));
+			logger.error(String.format(READ_FILE_ERROR, path));
 			logger.error("Stacktrace:", e);
 		}
 		return null;
@@ -53,12 +54,12 @@ public class FileHelper {
 	 * passed as an argument the corresponding config file is retrieved.
 	 *
 	 * @param dbType
-	 *            - enum type specifying the type of DatabaseCommands the user chooses to
-	 *            user.
+	 *            - enum type specifying the type of AbstractDatabase the user
+	 *            chooses to use.
 	 * @return an object of type {@link Properties}, containing properties in
 	 *         key-value pair format.
 	 */
-	public static Properties readDbPropertiesFile(DatabaseTypes dbType) {
+	public static Properties readDbPropertiesFile(DatabaseType dbType) {
 		String configPath = null;
 
 		switch (dbType) {
@@ -74,11 +75,11 @@ public class FileHelper {
 		}
 
 		Properties prop = new Properties();
-		try (FileInputStream fis = new FileInputStream(configPath)) {
-			prop.load(fis);
+		try (InputStream is = FileHelper.class.getResourceAsStream(configPath)) {
+			prop.load(is);
 		} catch (IOException e) {
 			logger.error(
-					String.format("An error occured while trying to read the database config file: %s", configPath));
+					String.format(DB_CONFIG_READ_ERROR, configPath));
 			logger.info("Stacktrace:", e);
 		}
 
