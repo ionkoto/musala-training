@@ -1,12 +1,12 @@
-package com.musala.simple.students.db;
+package com.musala.simple.students.db.database.impl;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoWriteException;
@@ -14,45 +14,41 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
-
-import java.lang.reflect.Field;
-
+import com.musala.simple.students.db.database.Database;
+import com.musala.simple.students.db.database.DatabaseCommands;
+import com.musala.simple.students.db.database.DatabaseProperties;
 import com.musala.simple.students.db.exception.StudentNotFoundException;
 import com.musala.simple.students.db.internal.ErrorMessage;
 import com.musala.simple.students.db.internal.InfoMessage;
 import com.musala.simple.students.db.student.Student;
 
 /**
- * MongoDb implementation of the {@link Database} interface.
+ * MongoDb implementation of the {@link DatabaseCommands} interface.
  * 
  * @author yoan.petrushinov
  *
  */
-public class MyMongoDatabase implements Database {
+public class MyMongoDatabase extends Database implements DatabaseCommands, DatabaseProperties {
 	private MongoClient mongo;
 	private MongoDatabase database;
 	private MongoCollection<Document> studentsCollection;
-	private String dbName;
-	private Logger logger = LoggerFactory.getLogger(Main.class);
 
-	public MyMongoDatabase(String dbName, String host, int port) {
-		this.setDbName(dbName);
-		this.setMongoClient(host, port);
-
-		// Accessing the database
+	@Override
+	public void establishConnection() {
+		this.setMongoClient();
 		this.setDatabase();
 		this.setStudentsCollection();
+		getLogger().info(InfoMessage.DATABASE_CONNECTION_SUCCESS);
 	}
-
+	
 	/**
 	 * 
 	 * @param host
-	 *            the hostname for establishing databse connection port the port
-	 *            number for the db connection
+	 *            the hostname for establishing database connection port the port
+	 *            number for the database connection
 	 */
-	private void setMongoClient(String host, int port) {
-		this.mongo = new MongoClient(host, port);
-		logger.info(InfoMessage.DATABASE_CONNECTION_SUCCESS);
+	private void setMongoClient() {
+		this.mongo = new MongoClient(this.getHost(), this.getPort());
 	}
 
 	private MongoClient getMongoClient() {
@@ -60,33 +56,17 @@ public class MyMongoDatabase implements Database {
 	}
 
 	/**
-	 * @return dbName the name of the current database being initialized
-	 */
-	private String getDbName() {
-		return dbName;
-	}
-
-	/**
-	 * 
-	 * @param dbName
-	 *            name of the database being initialized
-	 */
-	private void setDbName(String dbName) {
-		this.dbName = dbName;
-	}
-
-	/**
 	 * @return the {@link MongoDatabase} property
 	 */
 	private MongoDatabase getDatabase() {
-		return database;
+		return this.database;
 	}
 
 	/**
 	 * sets the {@link MyMongoDatabase#database} parameter
 	 */
 	private void setDatabase() {
-		this.database = this.getMongoClient().getDatabase(this.getDbName());
+		this.database = this.getMongoClient().getDatabase(this.getName());
 	}
 
 	/**
@@ -104,7 +84,7 @@ public class MyMongoDatabase implements Database {
 	}
 
 	/**
-	 * A MongoDb-specific implementation of the {@link Database#addStudent(Student)}
+	 * A MongoDb-specific implementation of the {@link DatabaseCommands#addStudent(Student)}
 	 * method. Extracts the properties of the {@link Student} object as an array of
 	 * Fields and then initializes a {@link Document} object to be added to the
 	 * collection (the MongoDb collection only accepts {@link Document} objects. The
@@ -126,33 +106,41 @@ public class MyMongoDatabase implements Database {
 			try {
 				newStudent.append(fieldName, field.get(student));
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				logger.error(String.format("An error occured while trying to add student with name %s to the database.",
+				getLogger().error(String.format("An error occured while trying to add student with name %s to the database.",
 						student.getName()));
-				logger.info("Stacktrace:", e);
+				getLogger().info("Stacktrace:", e);
 			}
 		}
 		try {
 			this.studentsCollection.insertOne(newStudent);
 		} catch (MongoWriteException e) {
 			if (e.getMessage().startsWith("E11000")) {
-				logger.error(String.format(
-						"Student %s with id %d can not be added to the Database. Student with the same id already exists\n",
+				getLogger().error(String.format(
+						"Student %s with id %d can not be added to the DatabaseCommands. Student with the same id already exists\n",
 						student.getName(), student.getId()));
 			} else {
-				logger.error(String.format("Problem occured while trying to add %s with id %d to the database.\n",
+				getLogger().error(String.format("Problem occured while trying to add %s with id %d to the database.\n",
 						student.getName(), student.getId()));
-				logger.error("Stacktrace:", e);
+				getLogger().error("Stacktrace:", e);
 			}
 		}
 	}
 
 	@Override
-	public void deleteStudentById(int studentId) {
+	public void deleteStudentById(int studentId) throws StudentNotFoundException {
+		Document query = new Document("id", studentId);
+		query = this.studentsCollection.find(query).first();
 
+		if (query == null) {
+			throw new StudentNotFoundException(ErrorMessage.STUDENT_NOT_EXISTS);
+		}
+
+		this.studentsCollection.deleteOne(query);
+		getLogger().info(String.format(InfoMessage.STUDENT_DELETE_SUCCESS, studentId));
 	}
 
 	/**
-	 * A MongoDb-specific implementation of the {@link Database#getStudentById()}
+	 * A MongoDb-specific implementation of the {@link DatabaseCommands#getStudentById()}
 	 * method. Searches the database for a document with an id property value equal
 	 * to the studentId param. If not found the method throws an exception. Else it
 	 * creates a student object with the required properties and returns it.
@@ -170,9 +158,21 @@ public class MyMongoDatabase implements Database {
 			throw new StudentNotFoundException(ErrorMessage.STUDENT_NOT_EXISTS);
 		}
 
+		return constructStudentObject(query);
+	}
+
+	/**
+	 * Creates a list of the Document's values and constructs
+	 * a student object with the extracted from the document
+	 * properties.
+	 * @param query The Document containing the Student's information in a
+	 * 		  database format.
+	 * @return the new Student object
+	 */
+	private Student constructStudentObject(Document query) {
 		List list = new ArrayList(query.values());
 		int id = (int) list.get(1);
-		String name = (String) list.get(2);
+		String name = Objects.toString(list.get(2));
 		int age = (int) list.get(3);
 		int grade = (int) list.get(4);
 
@@ -180,7 +180,7 @@ public class MyMongoDatabase implements Database {
 	}
 
 	/**
-	 * A MongoDb-specific implementation of the {@link Database#getAllStudentsArr()}
+	 * A MongoDb-specific implementation of the {@link DatabaseCommands#getAllStudentsArr()}
 	 * method. Retrieves the collection of {@link Document}s from the database, adds
 	 * the values of each document to a list and then assigns each value to the
 	 * corresponding property of a newly created Student objects. It then adds that
@@ -196,23 +196,17 @@ public class MyMongoDatabase implements Database {
 			while (cur.hasNext()) {
 
 				Document doc = cur.next();
-
-				List list = new ArrayList(doc.values());
-				int studentId = (int) list.get(1);
-				String studentName = (String) list.get(2);
-				int studentAge = (int) list.get(3);
-				int studentGrade = (int) list.get(4);
-
-				Student student = new Student(studentId, studentName, studentAge, studentGrade);
+				Student student = constructStudentObject(doc);
 				studentsList.add(student);
 			}
 		}
+		getLogger().info(InfoMessage.STUDENT_GET_ALL_SUCCESS);
 		return studentsList.toArray(new Student[studentsList.size()]);
 	}
 
 	/**
 	 * A MongoDb-specific implementation of the
-	 * {@link Database#getAllStudentsList()} method. Calls the
+	 * {@link DatabaseCommands#getAllStudentsList()} method. Calls the
 	 * {@link MyMongoDatabase#getAllStudentsArr()} and casts the returned array to a
 	 * List<Student> and returns it.
 	 * 
@@ -225,9 +219,9 @@ public class MyMongoDatabase implements Database {
 
 	/**
 	 * A MongoDb-specific implementation of the
-	 * {@link Database#addMultipleStudents(List<Student> students)} method. Iterates
+	 * {@link DatabaseCommands#addMultipleStudents(List<Student> students)} method. Iterates
 	 * over the List<Student> parameter and calls the
-	 * {@link Database#addStudent(Student)} method for each Student object.
+	 * {@link DatabaseCommands#addStudent(Student)} method for each Student object.
 	 * 
 	 * @param students
 	 *            a List containing multiple {@link Student} objects to be added to
@@ -242,9 +236,9 @@ public class MyMongoDatabase implements Database {
 
 	/**
 	 * A MongoDb-specific implementation of the
-	 * {@link Database#addMultipleStudents(Student[] students)} method. Iterates
+	 * {@link DatabaseCommands#addMultipleStudents(Student[] students)} method. Iterates
 	 * over the Student[] parameter and calls the
-	 * {@link Database#addStudent(Student)} method for each Student object.
+	 * {@link DatabaseCommands#addStudent(Student)} method for each Student object.
 	 * 
 	 * @param students
 	 *            an Array containing multiple {@link Student} objects to be added
@@ -255,4 +249,6 @@ public class MyMongoDatabase implements Database {
 		List<Student> studentsList = Arrays.asList(students);
 		this.addMultipleStudents(studentsList);
 	}
+
+	
 }

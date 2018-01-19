@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 
-import com.musala.simple.students.db.DatabaseTypes;
 import com.musala.simple.students.db.Main;
+import com.musala.simple.students.db.database.DatabaseTypes;
 import com.musala.simple.students.db.internal.PathConstants;
 
 /**
@@ -22,7 +22,7 @@ import com.musala.simple.students.db.internal.PathConstants;
  * 
  */
 public class FileHelper {
-	private static Logger logger = LoggerFactory.getLogger(Main.class);
+	private static Logger logger = LoggerFactory.getLogger(FileHelper.class);
 
 	private FileHelper() {
 
@@ -53,7 +53,7 @@ public class FileHelper {
 	 * passed as an argument the corresponding config file is retrieved.
 	 *
 	 * @param dbType
-	 *            - enum type specifying the type of Database the user chooses to
+	 *            - enum type specifying the type of DatabaseCommands the user chooses to
 	 *            user.
 	 * @return an object of type {@link Properties}, containing properties in
 	 *         key-value pair format.

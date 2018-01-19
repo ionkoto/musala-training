@@ -59,7 +59,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.musala.simple.students.Main</mainClass>
+									<mainClass>com.musala.simple.students.db.Main</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

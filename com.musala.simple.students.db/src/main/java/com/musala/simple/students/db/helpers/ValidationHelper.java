@@ -2,6 +2,9 @@ package com.musala.simple.students.db.helpers;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.musala.simple.students.db.internal.ErrorMessage;
@@ -13,6 +16,8 @@ import com.musala.simple.students.db.internal.ErrorMessage;
  * 
  */
 public class ValidationHelper {
+	private static Logger logger = LoggerFactory.getLogger(FileHelper.class);
+	
 	private ValidationHelper() {
 
 	}
@@ -31,7 +36,7 @@ public class ValidationHelper {
 
 		/* Check if any arguments are provided */
 		if (args.length == 0) {
-			System.err.println(ErrorMessage.PATH_MISSING);
+			logger.error(ErrorMessage.PATH_MISSING);
 			return false;
 		}
 
@@ -40,21 +45,21 @@ public class ValidationHelper {
 
 		/* Check if path exists */
 		if (!file.exists()) {
-			System.err.println(ErrorMessage.INVALID_PATH);
+			logger.error(ErrorMessage.INVALID_PATH);
 
 			return false;
 		}
 
 		/* Check if the valid path is a file */
 		if (!file.isFile()) {
-			System.err.println(ErrorMessage.NOT_A_FILE);
+			logger.error(ErrorMessage.NOT_A_FILE);
 
 			return false;
 		}
 
 		/* Check the file extension to be JSON. */
 		if (!argPath.endsWith(JSON_FILE_EXTENSION)) {
-			System.err.println(ErrorMessage.FILE_NOT_JSON);
+			logger.error(ErrorMessage.FILE_NOT_JSON);
 
 			return false;
 		}
@@ -102,13 +107,13 @@ public class ValidationHelper {
 		try {
 			int studentId = Integer.parseInt(args[1]);
 			if (studentId < 0) {
-				System.err.println(ErrorMessage.NEGATIVE_ID);
+				logger.warn(ErrorMessage.NEGATIVE_ID);
 				return false;
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		} catch (NumberFormatException e) {
-			System.err.println(ErrorMessage.INVALID_ID_FORMAT);
+			logger.warn(ErrorMessage.INVALID_ID_FORMAT);
 			return false;
 		}
 		return true;

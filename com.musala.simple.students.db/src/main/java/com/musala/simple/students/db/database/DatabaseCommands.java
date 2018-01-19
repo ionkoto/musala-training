@@ -1,4 +1,4 @@
-package com.musala.simple.students.db;
+package com.musala.simple.students.db.database;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import com.musala.simple.students.db.student.Student;
  * @author yoan.petrushinov
  *
  */
-public interface Database {
+public interface DatabaseCommands {
 
 	/**
 	 * Adds a student to the database.
@@ -46,8 +46,9 @@ public interface Database {
 	 * given id.
 	 *
 	 * @param  An int id to query the student by.
+	 * @throws StudentNotFoundException 
 	 */
-	public void deleteStudentById(int studentId);
+	public void deleteStudentById(int studentId) throws StudentNotFoundException;
 
 	/**
 	 * Retrieves a single student from the database by
