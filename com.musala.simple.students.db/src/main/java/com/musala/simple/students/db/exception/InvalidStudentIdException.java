@@ -1,4 +1,4 @@
-package com.musala.simple.students.exception;
+package com.musala.simple.students.db.exception;
 
 /**
  * This is a custom exception class used when a problem with invalid Student id
@@ -8,6 +8,8 @@ package com.musala.simple.students.exception;
  *
  */
 public class InvalidStudentIdException extends Exception {
+	private static final long serialVersionUID = 1L;
+
 	public InvalidStudentIdException(String message) {
 		super(message);
 	}

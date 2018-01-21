@@ -1,4 +1,4 @@
-package com.musala.simple.students.helpers;
+package com.musala.simple.students.helper;
 
 import java.io.File;
 import java.io.FileWriter;
