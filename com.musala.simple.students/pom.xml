@@ -46,6 +46,9 @@
                            <mainClass>com.musala.simple.students.Main</mainClass>
                         </manifest>
                      </archive>
+                     <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                     </descriptorRefs>
                   </configuration>
                </execution>
             </executions>
