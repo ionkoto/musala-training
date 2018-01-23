@@ -12,6 +12,11 @@ import java.util.List;
  *
  */
 public class StudentDataPrinter {
+    
+    private StudentDataPrinter() {
+
+    }
+    
 	/**
 	 * Outputs on the console the details of a given {@link Student} objects in a
 	 * specified format containing their Id, Name, Age and Grade properties.

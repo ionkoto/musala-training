@@ -11,51 +11,58 @@ import java.util.List;
  *
  */
 public class StudentDataPrinter {
-	/**
-	 * Outputs on the console the details of a given {@link Student} objects in a
-	 * specified format containing their Id, Name, Age and Grade properties.
-	 *
-	 * @param student
-	 *            A {@link Student} object, whose details are being printed.
-	 */
-	public static void printStudentDetails(Student student) {
-		StringBuilder outputSb = new StringBuilder();
-		outputSb.append(String.format("%-3s %-20s %-5s %-5s", "Id", "Name", "Age", "Grade"))
-				.append(System.lineSeparator()).append(String.format("%-3d %-20s %-5d %-5d", student.getId(),
-						student.getName(), student.getAge(), student.getGrade()));
+    private static final String STUDENT_PRINT_HEADING = String.format("%-3s %-20s %-5s %-5s", "Id", "Name", "Age", "Grade");
+    private static final String STUDENT_GROUP_PRINT_HEADING = "Student group: ";
+    
+    private StudentDataPrinter() {
 
-		System.out.println(outputSb.toString());
-	}
+    }
 
-	/**
-	 * Outputs on the console a list of {@link Student} objects in a specified
-	 * format containing their Id, Name, Age and Grade properties.
-	 *
-	 * @param students
-	 *            A List containing {@link Student} objects
-	 */
-	public static void printStudents(List<Student> studentsList) {
-		StringBuilder outputSb = new StringBuilder();
-		outputSb.append("Student group: ").append(System.lineSeparator()).append(System.lineSeparator())
-				.append(String.format("%-3s %-20s %-5s %-5s", "Id", "Name", "Age", "Grade"))
-				.append(System.lineSeparator());
+    /**
+     * Outputs on the console the details of a given {@link Student} objects in a
+     * specified format containing their Id, Name, Age and Grade properties.
+     *
+     * @param student
+     *            A {@link Student} object, whose details are being printed.
+     */
+    public static void printStudentDetails(Student student) {
+        StringBuilder outputSb = new StringBuilder();
+        outputSb.append(STUDENT_PRINT_HEADING)
+                .append(System.lineSeparator())
+                .append(student.toString());
 
-		for (Student student : studentsList) {
-			outputSb.append(String.format("%-3d %-20s %-5d %-5d", student.getId(), student.getName(), student.getAge(),
-					student.getGrade()));
-			outputSb.append(System.lineSeparator());
-		}
+        System.out.println(outputSb.toString());
+    }
 
-		System.out.println(outputSb.toString());
-	}
+    /**
+     * Outputs on the console a list of {@link Student} objects in a specified
+     * format containing their Id, Name, Age and Grade properties.
+     *
+     * @param students
+     *            A List containing {@link Student} objects
+     */
+    public static void printStudents(List<Student> studentsList) {
+        StringBuilder outputSb = new StringBuilder();
+        outputSb.append(STUDENT_GROUP_PRINT_HEADING)
+                .append(System.lineSeparator())
+                .append(STUDENT_PRINT_HEADING)
+                .append(System.lineSeparator());
 
-	/**
-	 * An overload of the {@link StudentDataPrinter#printStudents(List)}
-	 *
-	 * @param studentsArr
-	 *            An Array containing {@link Student} objects
-	 */
-	public static void printStudents(Student[] studentsArr) {
-		printStudents(Arrays.asList(studentsArr));
-	}
+        for (Student student : studentsList) {
+            outputSb.append(student.toString())
+                    .append(System.lineSeparator());
+        }
+
+        System.out.println(outputSb.toString());
+    }
+
+    /**
+     * An overload of the {@link StudentDataPrinter#printStudents(List)}
+     *
+     * @param studentsArr
+     *            An Array containing {@link Student} objects
+     */
+    public static void printStudents(Student[] studentsArr) {
+        printStudents(Arrays.asList(studentsArr));
+    }
 }
