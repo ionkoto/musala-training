@@ -8,9 +8,9 @@ package com.musala.simple.students.db.exception;
  *
  */
 public class InvalidStudentIdException extends Exception {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public InvalidStudentIdException(String message) {
-		super(message);
-	}
+    public InvalidStudentIdException(String message) {
+        super(message);
+    }
 }

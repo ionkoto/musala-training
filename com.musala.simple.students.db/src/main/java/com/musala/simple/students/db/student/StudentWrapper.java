@@ -9,5 +9,5 @@ package com.musala.simple.students.db.student;
  *
  */
 public class StudentWrapper {
-	public Student[] students;
+    public Student[] students;
 }

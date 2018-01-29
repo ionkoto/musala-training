@@ -1,103 +1,58 @@
 package com.musala.simple.students.db;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.Scanner;
 
 import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.musala.simple.students.db.database.AbstractDatabase;
-import com.musala.simple.students.db.database.DatabaseFactory;
 import com.musala.simple.students.db.database.DatabaseType;
-import com.musala.simple.students.db.exception.StudentNotFoundException;
-import com.musala.simple.students.db.helper.FileHelper;
-import com.musala.simple.students.db.helper.ValidationHelper;
-import com.musala.simple.students.db.internal.ErrorMessage;
-import com.musala.simple.students.db.student.Student;
-import com.musala.simple.students.db.student.StudentDataPrinter;
-import com.musala.simple.students.db.student.StudentGroup;
-import com.musala.simple.students.db.student.StudentWrapper;
+import com.musala.simple.students.db.helper.DbHelper;
+import com.musala.simple.students.db.internal.InfoMessage;
 
 public class Main {
-	private static final String DEFAULT_DB_NAME = "studentsDb";
-	private static final String DEFAULT_DB_PORT = "27017";
-	private static final String DEFAULT_DB_HOST = "localhost";
-	private static final String DEFAULT_DB_USERNAME = "admin";
-	private static final String DEFAULT_DB_PASSWORD = "admin";
-	private static final String DB_NAME = "name";
-	private static final String DB_PORT = "port";
-	private static final String DB_HOST = "host";
-	private static final String DB_USER = "username";
-	private static final String DB_PASSWORD = "password";
-	 
-	public static void main(String[] args) {
-		Logger logger = LoggerFactory.getLogger(Main.class);
-		
-		/* Sets up a default configuration for the log4j logger. This is suitable for printing 
-		 * out logging statements to the standard console. For writing logs to a file you need
-		 * to create a configuration file with more specific settings. Please refer to:
-		 * http://www.codejava.net/coding/how-to-configure-log4j-as-logging-mechanism-in-java */
-		BasicConfigurator.configure();
+    private static final String PROMPT_USER = "Choose database: \nPress '1' for MySql, press '2' for MongoDb, press '3' for both. Press 'ENTER' to confirm.";
 
-		Properties dbProperties = FileHelper.readDbPropertiesFile(DatabaseType.MongoDb);
-		AbstractDatabase database = DatabaseFactory.createDatabase(DatabaseType.MongoDb)
-				.withName(dbProperties.getProperty(DB_NAME, DEFAULT_DB_NAME))
-				.withHost(dbProperties.getProperty(DB_HOST, DEFAULT_DB_HOST))
-				.withPort(dbProperties.getProperty(DB_PORT, DEFAULT_DB_PORT))
-				.withUsername(dbProperties.getProperty(DB_USER, DEFAULT_DB_USERNAME))
-				.withPassword(dbProperties.getProperty(DB_PASSWORD, DEFAULT_DB_PASSWORD))
-				.build();
-		database.establishConnection();
+    private static Logger logger = LoggerFactory.getLogger(Main.class);
+    
+    public static void main(String[] args) {
+        /*
+         * Sets up a default configuration for the log4j logger. This is suitable for printing
+         * out logging statements to the standard console. For writing logs to a file you need
+         * to create a configuration file with more specific settings. Please refer to:
+         * http://www.codejava.net/coding/how-to-configure-log4j-as-logging-mechanism-in-java
+         */
+        BasicConfigurator.configure();
 
-		if (ValidationHelper.isInputValid(args)) {
+        System.out.println(PROMPT_USER);
+        Scanner scanner = new Scanner(System.in);
 
-			String studentsJsonInfo = FileHelper.readFile(args[0]);
+        AbstractDatabase mySqlDb;
+        AbstractDatabase mongoDb;
 
-			if (!ValidationHelper.isValidJson(studentsJsonInfo)) {
-				logger.warn(ErrorMessage.NOT_VALID_JSON);
-				Student[] students = database.getAllStudentsArr();
-				StudentDataPrinter.printStudents(students);
-			} else {
-				StudentWrapper studentWrapper = new Gson().fromJson(studentsJsonInfo, StudentWrapper.class);
-				StudentGroup studentGroup = new StudentGroup();
-				studentGroup.fillStudentGroup(studentWrapper.students);
-				Map<Integer, Student> studentsMap = studentGroup.getStudents();
-				List<Student> studentsList = new ArrayList<Student>(studentsMap.values());
-				database.addMultipleStudents(studentsList);
-				
-				if (ValidationHelper.validRequest(args)) {
-					int studentId = Integer.parseInt(args[1]);
-					try {
-						// Look for the student in the Student Group
-						Student student = studentGroup.getStudentById(studentId);
-						StudentDataPrinter.printStudentDetails(student);
-					} catch (StudentNotFoundException snfe) {
-						logger.warn(ErrorMessage.STUDENT_NOT_FOUND);
-						try {
-							Student student = database.getStudentById(studentId);
-							StudentDataPrinter.printStudentDetails(student);
-						} catch (StudentNotFoundException e) {
-							logger.warn(String.format(
-									"Could not retrieve student with id: %d\n", studentId));
-							logger.warn(ErrorMessage.STUDENT_NOT_EXISTS);
-							StudentDataPrinter.printStudents(studentsList);
-						}
-					}
-				} else {
-					StudentDataPrinter.printStudents(studentsList);
-				}
-			}
-		} else {
-			Student[] students = database.getAllStudentsArr();
-			if (students.length == 0) {
-				logger.info(ErrorMessage.DATABASE_EMPTY);
-			} else {
-				StudentDataPrinter.printStudents(students);
-			}
-		}
-	}
+        int dbChoice = scanner.nextInt();
+        scanner.close();
+        switch (dbChoice) {
+            case 1:
+                mySqlDb = DbHelper.initializeDatabase(DatabaseType.MySQL);
+                DbHelper.performDatabaseActions(args, mySqlDb);
+                break;
+            case 2:
+                mongoDb = DbHelper.initializeDatabase(DatabaseType.MongoDb);
+                DbHelper.performDatabaseActions(args, mongoDb);
+                break;
+            case 3:
+                mySqlDb = DbHelper.initializeDatabase(DatabaseType.MySQL);
+                mongoDb = DbHelper.initializeDatabase(DatabaseType.MongoDb);
+                DbHelper.performDatabaseActions(args, mySqlDb);
+                DbHelper.performDatabaseActions(args, mongoDb);
+                break;
+            default:
+                mongoDb = DbHelper.initializeDatabase(DatabaseType.MongoDb);
+                DbHelper.performDatabaseActions(args, mongoDb);
+                logger.info(InfoMessage.DEFAULT_DATABASE_INITIALIZATION);
+                break;
+        }
+    }
 }
