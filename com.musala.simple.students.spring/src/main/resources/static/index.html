@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous">
+    </script>
+    <title>StudentsDB</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="yoan" content="StudentsDb">
+    <link rel="stylesheet" href="">
+
+</head>
+
+<body>
+    <div>
+        <form method="POST" id="student_form" action="/students/add">
+            <label>Id:</label>
+            <input type="number" name="id" id="id" />
+            <label>Name:</label>
+            <input type="text" name="name" id="name" />
+            <label>Age:</label>
+            <input type="number" name="age" id="age" />
+            <label>Grade:</label>
+            <input type="number" name="grade" id="grade" />
+            <input type="submit" value="Submit" name="submit" class="submit" id="submit" />
+        </form>
+    </div>
+    <script type="text/javascript">
+		$(document).ready(function () {
+			$("#student_form").submit(function (event) {
+				event.preventDefault();
+				let id = $('#id').val();
+				let name = $('#name').val();
+				let age = $('#age').val();
+				let grade = $('#grade').val();
+				let student = {"id":id, "name": name, "age":age, "grade":grade};
+				console.log(JSON.stringify(student));
+				
+				$.ajax({
+					type: "POST",
+					contentType: "application/json",
+					url: "students/add",
+					data: JSON.stringify(student),
+					dataType: 'json',
+					cache: false,
+					timeout: 600000,
+					success: function (data) {
+						window.location.replace("http://localhost:1234/students/all");
+						console.log("SUCCESS : ", data);
+						
+					},
+					error: function (e) {
+						console.log("ERROR : ", e);
+					}
+				});
+			});
+		});
+    </script>
+</body>
+
+</html>
