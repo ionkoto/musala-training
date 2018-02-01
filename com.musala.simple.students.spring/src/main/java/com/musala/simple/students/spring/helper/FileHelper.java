@@ -73,6 +73,10 @@ public class FileHelper {
                 break;
         }
 
+        return readPropertiesFile(configPath);
+    }
+
+    public static Properties readPropertiesFile(String configPath) {
         Properties prop = new Properties();
         try (InputStream is = FileHelper.class.getResourceAsStream(configPath)) {
             prop.load(is);

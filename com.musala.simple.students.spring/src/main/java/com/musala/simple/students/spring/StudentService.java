@@ -31,7 +31,7 @@ public class StudentService {
                 break;
         }
     }
-    
+
     public static boolean deleteStudent(DatabaseType dbType, int studentId) {
         switch (dbType) {
             case MySQL:
@@ -63,7 +63,7 @@ public class StudentService {
                 return new ArrayList<>();
         }
     }
-    
+
     public static Student getStudent(DatabaseType dbType, int studentId) {
         switch (dbType) {
             case MySQL:
