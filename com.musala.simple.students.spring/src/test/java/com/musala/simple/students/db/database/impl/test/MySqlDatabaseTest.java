@@ -12,13 +12,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.musala.simple.students.spring.database.AbstractDatabase;
-import com.musala.simple.students.spring.database.DatabaseFactory;
-import com.musala.simple.students.spring.database.DatabaseType;
-import com.musala.simple.students.spring.database.impl.MySqlDatabase;
-import com.musala.simple.students.spring.exception.StudentNotFoundException;
-import com.musala.simple.students.spring.internal.ErrorMessage;
-import com.musala.simple.students.spring.student.Student;
+import com.musala.simple.students.spring.web.database.AbstractDatabase;
+import com.musala.simple.students.spring.web.database.DatabaseFactory;
+import com.musala.simple.students.spring.web.database.DatabaseType;
+import com.musala.simple.students.spring.web.database.impl.MySqlDatabase;
+import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
+import com.musala.simple.students.spring.web.internal.ErrorMessage;
+import com.musala.simple.students.spring.web.student.Student;
 
 import ch.vorburger.exec.ManagedProcessException;
 import ch.vorburger.mariadb4j.DB;

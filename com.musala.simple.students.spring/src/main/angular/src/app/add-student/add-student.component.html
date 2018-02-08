@@ -1,0 +1,37 @@
+<form (ngSubmit)="onSubmit(form)" #form="ngForm" name="myForm">
+
+  <div class="form-group">
+    <label for="age">Id</label>
+    <input type="number" id="id" name="id" class="form-control" [ngModel]="defaultId" required #idCtrl="ngModel">
+    <span class="help-block" *ngIf="idCtrl.invalid && idCtrl.touched">Please enter student's id!</span>
+  </div>
+
+  <div class="form-group">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" class="form-control" [ngModel]="defaultName" required #nameCtrl="ngModel">
+    <span class="help-block" *ngIf="nameCtrl.invalid && nameCtrl.touched">Please enter student's name!</span>
+  </div>
+
+  <div class="form-group">
+    <label for="age">Age</label>
+    <input type="number" id="age" name="age" class="form-control" [ngModel]="defaultAge" required #ageCtrl="ngModel">
+    <span class="help-block" *ngIf="ageCtrl.invalid && ageCtrl.touched">Please enter student's age!</span>
+  </div>
+
+  <div class="form-group">
+    <label for="age">Grade</label>
+    <input type="number" id="grade" name="grade" class="form-control" [ngModel]="defaultGrade" required #gradeCtrl="ngModel">
+    <span class="help-block" *ngIf="gradeCtrl.invalid && gradeCtrl.touched">Please enter student's grade!</span>
+  </div>
+
+  <div class="form-group">
+    <label for="dbType">Choose Database</label>
+    <select name="dbType" id="dbType" class="form-control" required [ngModel]="defaultDbType" #dbTypeCtrl="ngModel">
+      <option *ngFor="let option of availableDbs" [value]="option.value">
+        {{option.display}}
+      </option>
+    </select>
+  </div>
+
+  <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Add Student</button>
+</form>

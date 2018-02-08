@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.musala.simple.students.spring.student.Student;
+import com.musala.simple.students.spring.web.student.Student;
 
 public class StudentTest {
 

@@ -1,0 +1,20 @@
+<div *ngIf="isStudentLoaded" class='container profile-container'>
+  <div class='profile-info clearfix'>
+    <h4>
+      <strong *ngIf='dbType == "mongo"'>Database: Mongo Db</strong>
+      <strong *ngIf='dbType == "mysql"'>Database: MySql</strong>
+    </h4>
+    <h4>
+      <strong>Id: {{student.id}}</strong>
+    </h4>
+    <h4>
+      <strong>Name: {{student.name}}</strong>
+    </h4>
+    <h4>
+      <strong>Age: {{student.age }}</strong>
+    </h4>
+    <h4>
+      <strong>Grade: {{student.grade }}</strong>
+    </h4>
+  </div>
+</div>
