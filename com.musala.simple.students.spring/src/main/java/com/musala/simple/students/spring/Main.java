@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.musala.simple.students.spring.web.StudentService;
+
 @SpringBootApplication
 public class Main {
     private static final String DB_CONNECTION_SUCCESS = "Successfully established connection with both MongoDb and MySQL Databases!";

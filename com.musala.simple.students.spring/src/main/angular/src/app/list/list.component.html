@@ -1,0 +1,59 @@
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <form [formGroup]="myForm">
+    <div class="btn-group">
+      <label class="btn btn-primary" [class.active]="myForm.value.mongo" btnCheckbox formControlName="mongo">MongoDb</label>
+
+      <label class="btn btn-primary" [class.active]="myForm.value.mysql" btnCheckbox formControlName="mysql">MySql</label>
+    </div>
+  </form>
+</div>
+
+<div>
+  <toaster-container [toasterconfig]="config1"></toaster-container>
+</div>
+
+
+<div class="container">
+  <div class="row">
+    <div *ngIf='mongoStudents.length > 0' class="col-xs-6">
+      <h2>Mongo Db</h2>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Age</th>
+            <th scope="col">Grade</th>
+            <th scope="col">Actions</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let student of mongoStudents" app-item [student]="student" app-item [dbType]="'mongo'"></tr>
+          <router-outlet></router-outlet>
+        </tbody>
+      </table>
+    </div>
+
+
+    <div *ngIf='mysqlStudents.length > 0' class="col-xs-6">
+      <h2>MySql Db</h2>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Age</th>
+            <th scope="col">Grade</th>
+            <th scope="col">Actions</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let student of mysqlStudents" app-item [student]="student" app-item [dbType]="'mysql'"></tr>
+          <router-outlet></router-outlet>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

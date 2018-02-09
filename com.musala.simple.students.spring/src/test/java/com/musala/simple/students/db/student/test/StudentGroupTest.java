@@ -2,18 +2,15 @@ package com.musala.simple.students.db.student.test;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.musala.simple.students.spring.exception.StudentNotFoundException;
-import com.musala.simple.students.spring.helper.FileHelper;
-import com.musala.simple.students.spring.internal.ErrorMessage;
-import com.musala.simple.students.spring.student.Student;
-import com.musala.simple.students.spring.student.StudentGroup;
+import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
+import com.musala.simple.students.spring.web.internal.ErrorMessage;
+import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.student.StudentGroup;
 
 public class StudentGroupTest {
     private static Student[] studentsArrFirst;

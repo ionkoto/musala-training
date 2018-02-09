@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.musala.simple.students.spring.database.AbstractDatabase;
-import com.musala.simple.students.spring.database.DatabaseFactory;
-import com.musala.simple.students.spring.database.DatabaseType;
-import com.musala.simple.students.spring.database.impl.MyMongoDatabase;
-import com.musala.simple.students.spring.database.impl.MySqlDatabase;
+import com.musala.simple.students.spring.web.database.AbstractDatabase;
+import com.musala.simple.students.spring.web.database.DatabaseFactory;
+import com.musala.simple.students.spring.web.database.DatabaseType;
+import com.musala.simple.students.spring.web.database.impl.MyMongoDatabase;
+import com.musala.simple.students.spring.web.database.impl.MySqlDatabase;
 
 public class DatabaseFactoryTest {
 

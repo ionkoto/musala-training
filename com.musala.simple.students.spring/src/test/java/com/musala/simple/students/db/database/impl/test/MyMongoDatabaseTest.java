@@ -13,11 +13,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.musala.simple.students.spring.database.AbstractDatabase;
-import com.musala.simple.students.spring.database.DatabaseFactory;
-import com.musala.simple.students.spring.database.DatabaseType;
-import com.musala.simple.students.spring.exception.StudentNotFoundException;
-import com.musala.simple.students.spring.student.Student;
+import com.musala.simple.students.spring.web.database.AbstractDatabase;
+import com.musala.simple.students.spring.web.database.DatabaseFactory;
+import com.musala.simple.students.spring.web.database.DatabaseType;
+import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
+import com.musala.simple.students.spring.web.student.Student;
 
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;

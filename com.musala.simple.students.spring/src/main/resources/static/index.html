@@ -14,7 +14,7 @@
 
 <body>
     <div>
-        <form method="POST" id="student_form" action="/students/add">
+        <form method="POST" id="student_form" action=`/students/add`>
             <label>Id:</label>
             <input type="number" name="id" id="id" />
             <label>Name:</label>
@@ -23,6 +23,10 @@
             <input type="number" name="age" id="age" />
             <label>Grade:</label>
             <input type="number" name="grade" id="grade" />
+			<select name="dbType" id="dbType">
+			  <option value="mongo">MongoDb</option>
+			  <option value="mysql">MySql</option>
+			</select>
             <input type="submit" value="Submit" name="submit" class="submit" id="submit" />
         </form>
     </div>
@@ -35,18 +39,18 @@
 				let age = $('#age').val();
 				let grade = $('#grade').val();
 				let student = {"id":id, "name": name, "age":age, "grade":grade};
-				console.log(JSON.stringify(student));
+				let dbChoice = $('#dbType option:selected').val();
 				
 				$.ajax({
 					type: "POST",
 					contentType: "application/json",
-					url: "students/add",
+					url: `students/add/${dbChoice}`,
 					data: JSON.stringify(student),
 					dataType: 'json',
 					cache: false,
 					timeout: 600000,
 					success: function (data) {
-						window.location.replace("http://localhost:1234/students/all");
+						window.location.replace("http://localhost:1234/students/all/" + dbChoice);
 						console.log("SUCCESS : ", data);
 						
 					},

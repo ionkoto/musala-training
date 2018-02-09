@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.musala.simple.students.spring.helper.ValidationHelper;
+import com.musala.simple.students.spring.web.helper.ValidationHelper;
 
 public class ValidationHelperTest {
 

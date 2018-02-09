@@ -6,8 +6,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.musala.simple.students.spring.database.DatabaseType;
-import com.musala.simple.students.spring.helper.FileHelper;
+import com.musala.simple.students.spring.web.database.DatabaseType;
+import com.musala.simple.students.spring.web.helper.FileHelper;
 
 public class FileHelperTest {
 
