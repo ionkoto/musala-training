@@ -13,6 +13,8 @@ import { StudentComponent } from './student/student.component';
 import { AddStudentModule } from './add-student/add-student.module';
 import { ModalModule } from 'ngx-bootstrap';
 import { ButtonsModule } from 'ngx-bootstrap';
+import { ToasterModule, ToasterService } from 'angular2-toaster';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,10 @@ import { ButtonsModule } from 'ngx-bootstrap';
     AddStudentModule,
     FormsModule,
     ReactiveFormsModule,
-    ButtonsModule.forRoot()
+    ToasterModule,
+    ButtonsModule.forRoot(),
+    BrowserAnimationsModule, 
+    ToasterModule.forRoot()
   ],
   providers: [StudentsService],
   bootstrap: [AppComponent]

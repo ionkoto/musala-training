@@ -38,6 +38,7 @@ export class AppComponent implements OnInit {
     var self = this;
     this.studentsService.fetchEvents()
       .subscribe((data: Response) => {
+        
         let incomingEvents = []
         for (let index in data) {
           incomingEvents.push(data[index]);

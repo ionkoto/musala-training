@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.mongodb.client.MongoDatabase;
 import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.helper.FileHelper;
 import com.musala.simple.students.spring.web.student.Student;
@@ -35,6 +36,8 @@ public class StudentsController {
     private static final String APP_PROPERTIES_FILE_PATH = "/application.properties";
     private static final String HOST_PROP = "management.address";
     private static final String PORT_PROP = "server.port";
+    private static final String MONGO = "mongo";
+    private static final String MYSQL = "mysql";
 
     @PostMapping("students/add/{dbType}")
     @CrossOrigin(origins = { "http://localhost:4200", "http://localhost:1234" })
@@ -44,10 +47,10 @@ public class StudentsController {
         boolean studentAddSuccess = false;
 
         switch (dbType) {
-            case "mongo":
+            case MONGO:
                 studentAddSuccess = StudentService.addStudent(student, DatabaseType.MongoDb);
                 break;
-            case "mysql":
+            case MYSQL:
                 studentAddSuccess = StudentService.addStudent(student, DatabaseType.MySQL);
                 break;
             default:
@@ -70,10 +73,10 @@ public class StudentsController {
     public List<Student> showAllStudents(@PathVariable("dbType") String dbType) {
         List<Student> studentList = null;
         switch (dbType) {
-            case "mongo":
+            case MONGO:
                 studentList = StudentService.getStudents(DatabaseType.MongoDb);
                 break;
-            case "mysql":
+            case MYSQL:
                 studentList = StudentService.getStudents(DatabaseType.MySQL);
                 break;
             default:
@@ -88,10 +91,10 @@ public class StudentsController {
         Student student = null;
 
         switch (dbType) {
-            case "mongo":
+            case MONGO:
                 student = StudentService.getStudent(DatabaseType.MongoDb, id);
                 break;
-            case "mysql":
+            case MYSQL:
                 student = StudentService.getStudent(DatabaseType.MySQL, id);
                 break;
             default:
@@ -120,10 +123,10 @@ public class StudentsController {
         boolean success = false;
 
         switch (dbType) {
-            case "mongo":
+            case MONGO:
                 success = StudentService.deleteStudent(DatabaseType.MongoDb, id);
                 break;
-            case "mysql":
+            case MYSQL:
                 success = StudentService.deleteStudent(DatabaseType.MySQL, id);
                 break;
             default:
