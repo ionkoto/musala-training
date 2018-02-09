@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.mongodb.client.MongoDatabase;
 import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.helper.FileHelper;
 import com.musala.simple.students.spring.web.student.Student;

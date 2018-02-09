@@ -48,7 +48,6 @@ export class StudentsService {
             this.mysqlStudentsChanged.next();
             break;
           }
-          //this.studentsChanged.next();
         }
   });
 }
@@ -68,7 +67,6 @@ addStudent(newStudent, dbType) : Observable < Object > {
           break;
         }
       }
-      //this.studentsChanged.next();
       return response.json();
     })
     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
@@ -107,7 +105,6 @@ deleteStudentById(id, dbType) {
           break;
         }
       }
-      //this.studentsChanged.next();
       return response.json();
     })
     .catch((error: any) => Observable.throw(error.json().error || 'Server error'));

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {StudentsService} from "../students.service";
 import { NgForm } from '@angular/forms';
 import {Router} from '@angular/router';
@@ -8,7 +8,7 @@ import {Router} from '@angular/router';
   templateUrl: './add-student.component.html',
   styleUrls: ['./add-student.component.css']
 })
-export class AddStudentComponent implements OnInit {
+export class AddStudentComponent {
   studentService: StudentsService;
   availableDbs = [
     { display: 'MySql', value: 'mysql'},
@@ -38,8 +38,5 @@ export class AddStudentComponent implements OnInit {
   }
   constructor(studentService: StudentsService, private router: Router) {
     this.studentService = studentService;
-  }
-
-  ngOnInit() {
   }
 }

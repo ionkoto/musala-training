@@ -11,7 +11,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.css']
 })
-export class ItemComponent implements OnInit {
+export class ItemComponent {
   @Input("student") student;
   @Input("dbType") dbType;
   objectKeys = Object.keys;
@@ -24,10 +24,6 @@ export class ItemComponent implements OnInit {
   constructor(studentsService: StudentsService, router: Router, private modalService: BsModalService) {
     this.studentsService = studentsService;
     this.router = router;
-  }
-
-  ngOnInit() {
-    
   }
 
   openModal(template: TemplateRef<any>) {
