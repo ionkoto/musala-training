@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
-import {StudentsService} from "../students.service";
+import { StudentsService } from "../students.service";
 import { NgForm } from '@angular/forms';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
+import { ToasterModule, ToasterService, ToasterConfig, Toast } from 'angular2-toaster';
+import { CustomToast } from '../toaster.service';
 
 @Component({
   selector: 'app-add-student',
@@ -10,13 +12,24 @@ import {Router} from '@angular/router';
 })
 export class AddStudentComponent {
   studentService: StudentsService;
+  private toasterService: ToasterService;
+
   availableDbs = [
-    { display: 'MySql', value: 'mysql'},
-    { display: 'MongoDb', value: 'mongo'}
+    { display: 'MySql', value: 'mysql' },
+    { display: 'MongoDb', value: 'mongo' }
   ];
 
-  onSubmit(submittedForm : NgForm) {
-    if (submittedForm.invalid){
+  constructor(studentService: StudentsService, private router: Router, toasterService: ToasterService) {
+    this.studentService = studentService;
+    this.toasterService = toasterService;
+  }
+
+  public config1: ToasterConfig = new ToasterConfig({
+    positionClass: 'toast-top-right'
+  });
+
+  onSubmit(submittedForm: NgForm) {
+    if (submittedForm.invalid) {
       return;
     }
     const newStudent = {
@@ -26,17 +39,17 @@ export class AddStudentComponent {
       grade: submittedForm.value.grade
     }
     const dbType = submittedForm.value.dbType;
+
     this.studentService.addStudent(newStudent, dbType)
       .subscribe(
-        res => {
-          submittedForm.resetForm();
-          this.router.navigateByUrl(`students/all`);
-        }, 
-        err => {
-          console.log(err);
-        });
-  }
-  constructor(studentService: StudentsService, private router: Router) {
-    this.studentService = studentService;
+      res => {
+        submittedForm.resetForm();
+        this.router.navigateByUrl(`students/all`);
+      },
+      err => {
+        const possibleError = "Possible reason: Duplicate student ID.";
+        let toast = new CustomToast().generateToast("error", "Student add fail", `${err.msg} ${possibleError}`);
+        this.toasterService.pop(toast);
+      });
   }
 }
