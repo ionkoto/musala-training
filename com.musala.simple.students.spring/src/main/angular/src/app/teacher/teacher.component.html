@@ -1,0 +1,17 @@
+<div *ngIf="isTeacherLoaded" class='container profile-container'>
+  <div class='profile-info clearfix'>
+    <h4>
+      <strong *ngIf='dbType == "mongo"'>Database: Mongo Db</strong>
+      <strong *ngIf='dbType == "mysql"'>Database: MySql</strong>
+    </h4>
+    <h4>
+      <strong>Id: {{teacher.id}}</strong>
+    </h4>
+    <h4>
+      <strong>Name: {{teacher.name}}</strong>
+    </h4>
+    <h4>
+      <strong>Email: {{teacher.email }}</strong>
+    </h4>
+  </div>
+</div>

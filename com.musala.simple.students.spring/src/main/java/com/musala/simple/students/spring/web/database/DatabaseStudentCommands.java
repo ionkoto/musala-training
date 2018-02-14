@@ -3,19 +3,19 @@ package com.musala.simple.students.spring.web.database;
 import java.util.List;
 
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
-import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.models.student.Student;
 
 /**
  * The interface serves as an middle abstraction layer for
  * database communication. It gives the user the basic
- * functionality when working with a database, providing the
+ * functionality when working with student entities from database, providing the
  * opportunity to use different implementation depending on
  * the preferred database type.
  * 
  * @author yoan.petrushinov
  *
  */
-public interface DatabaseCommands {
+public interface DatabaseStudentCommands {
 
     /**
      * Adds a student to the database.

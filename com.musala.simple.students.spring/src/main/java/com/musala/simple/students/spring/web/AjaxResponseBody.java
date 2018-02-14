@@ -3,7 +3,7 @@ package com.musala.simple.students.spring.web;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.models.student.Student;
 
 /**
  * This is a template class for constructing an Ajax Response to use in the

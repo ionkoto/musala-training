@@ -1,18 +1,18 @@
 import { Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from "@angular/router";
-import { StudentsService } from "../students.service";
+import { StudentsService } from "../../students.service";
 import { NgForm, FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { Observable, Subject, Subscription } from 'rxjs';
 
 import { ToasterModule, ToasterService, ToasterConfig, Toast } from 'angular2-toaster';
-import { CustomToast } from '../toaster.service';
+import { CustomToast } from '../../toaster.service';
 
 @Component({
   selector: 'app-list',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.css']
+  templateUrl: './student-list.component.html',
+  styleUrls: ['./student-list.component.css']
 })
-export class ListComponent implements OnInit, OnDestroy {
+export class StudentListComponent implements OnInit, OnDestroy {
   mongoStudents = [];
   mongoStudentsToShow = [];
   mysqlStudents = [];
@@ -78,7 +78,7 @@ export class ListComponent implements OnInit, OnDestroy {
     });
 
     if (this.myForm.value.mongo && this.mongoStudents.length === 0) {
-      this.studentsService.fetchStudents("mongo");      
+      this.studentsService.fetchStudents("mongo");  
     }
     if (this.myForm.value.mysql && this.mysqlStudents.length === 0) {
       this.studentsService.fetchStudents("mysql");

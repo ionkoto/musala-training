@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum DbEvents {
+public enum DbEventsStudents {
     DeleteStudentSuccessMySql("Student was deleted successfully!", "3.1.1"),
     DeleteStudentSuccessMongo("Student was deleted successfully!", "3.1.2"),
     DeleteStudentFail("Couldn't delete student", "1.1"),
@@ -27,7 +27,7 @@ public enum DbEvents {
     private final String message;
     private final String code;
 
-    DbEvents(String message, String code) {
+    DbEventsStudents(String message, String code) {
         this.message = message;
         this.code = code;
     }

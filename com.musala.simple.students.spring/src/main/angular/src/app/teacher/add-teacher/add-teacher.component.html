@@ -1,0 +1,36 @@
+<div class="container">
+  <div>
+    <toaster-container [toasterconfig]="config1"></toaster-container>
+  </div>
+  <form (ngSubmit)="onSubmit(form)" #form="ngForm" name="myForm" id="add-teacher-form">
+
+    <div class="form-group">
+      <label for="age">Id</label>
+      <input type="number" id="id" name="id" class="form-control" [ngModel]="defaultId" required #idCtrl="ngModel">
+      <span class="help-block" *ngIf="idCtrl.invalid && idCtrl.touched">Please enter teacher's id!</span>
+    </div>
+
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" class="form-control" [ngModel]="defaultName" required #nameCtrl="ngModel">
+      <span class="help-block" *ngIf="nameCtrl.invalid && nameCtrl.touched">Please enter teacher's name!</span>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="text" id="email" name="email" class="form-control" [ngModel]="defaultEmail" required #emailCtrl="ngModel">
+      <span class="help-block" *ngIf="emailCtrl.invalid && emailCtrl.touched">Please enter teacher's email!</span>
+    </div>
+
+    <div class="form-group">
+      <label for="dbType">Choose Database</label>
+      <select name="dbType" id="dbType" class="form-control" required [ngModel]="defaultDbType" #dbTypeCtrl="ngModel">
+        <option *ngFor="let option of availableDbs" [value]="option.value">
+          {{option.display}}
+        </option>
+      </select>
+      <span class="help-block" *ngIf="dbTypeCtrl.invalid && dbTypeCtrl.touched">Please select a database!</span>      
+    </div>
+    <button class="btn btn-primary" id="add-teacher-submit" type="submit" [disabled]="form.invalid">Add teacher</button>
+  </form>
+</div>

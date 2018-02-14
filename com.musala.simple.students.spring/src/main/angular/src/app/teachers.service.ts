@@ -5,16 +5,16 @@ import 'rxjs/add/operator/map';
 import { Observable } from 'rxjs/Rx';
 
 @Injectable()
-export class StudentsService {
-  studentsMongo = [
+export class TeachersService {
+  teachersMongo = [
 
   ];
-  studentsMysql = [
+  teachersMysql = [
 
   ];
-  student: Object;
-  mongoStudentsChanged = new Subject<void>();
-  mysqlStudentsChanged = new Subject<void>();
+  teacher: Object;
+  mongoTeachersChanged = new Subject<void>();
+  mysqlTeachersChanged = new Subject<void>();
   http: Http;
 
   constructor(http: Http) {
@@ -30,40 +30,40 @@ export class StudentsService {
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 
-  fetchStudents(dbType) {
-    this.http.get(`http://localhost:1234/students/all/${dbType}`)
+  fetchTeachers(dbType) {
+    this.http.get(`http://localhost:1234/teachers/all/${dbType}`)
       .map((response: Response) => {    // this map comes from RXJS
         return response.json();
       })
       .subscribe(
-      (studentsFromDB) => {
+      (teachersFromDB) => {
         switch (dbType) {
           case "mongo": {
-            this.studentsMongo = studentsFromDB;
-            this.mongoStudentsChanged.next();
+            this.teachersMongo = teachersFromDB;
+            this.mongoTeachersChanged.next();
             break;
           }
           case "mysql": {
-            this.studentsMysql = studentsFromDB;
-            this.mysqlStudentsChanged.next();
+            this.teachersMysql = teachersFromDB;
+            this.mysqlTeachersChanged.next();
             break;
           }
         }
       });
   }
 
-  addStudent(newStudent, dbType): Observable<Object> {
-    return this.http.post(`http://localhost:1234/students/add/${dbType}`, newStudent)
+  addTeacher(newTeacher, dbType): Observable<Object> {
+    return this.http.post(`http://localhost:1234/teachers/add/${dbType}`, newTeacher)
       .map((response: Response) => {
         switch (dbType) {
           case "mongo": {
-            this.studentsMongo.unshift(newStudent);
-            this.mongoStudentsChanged.next();
+            this.teachersMongo.unshift(newTeacher);
+            this.mongoTeachersChanged.next();
             break;
           }
           case "mysql": {
-            this.studentsMysql.unshift(newStudent);
-            this.mysqlStudentsChanged.next();
+            this.teachersMysql.unshift(newTeacher);
+            this.mysqlTeachersChanged.next();
             break;
           }
         }
@@ -72,36 +72,36 @@ export class StudentsService {
       .catch((error: any) => Observable.throw(error.json() || 'Server error'));
   }
 
-  getStudents(dbType) {
+  getTeachers(dbType) {
     switch (dbType) {
-      case "mongo": return this.studentsMongo;
-      case "mysql": return this.studentsMysql;
+      case "mongo": return this.teachersMongo;
+      case "mysql": return this.teachersMysql;
     }
   }
 
-  getStudentById(id, dbType): Observable<Object> {
+  getTeacherById(id, dbType): Observable<Object> {
     return this.http
-      .get(`http://localhost:1234/students/${dbType}/${id}`)
+      .get(`http://localhost:1234/teachers/${dbType}/${id}`)
       .map((response: Response) => {    // this map comes from RXJS
         return response.json();
       })
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 
-  deleteStudentById(id, dbType) {
+  deleteTeacherById(id, dbType) {
     return this.http
-      .delete(`http://localhost:1234/students/delete/${id}/${dbType}`)
+      .delete(`http://localhost:1234/teachers/delete/${id}/${dbType}`)
       .map((response: Response) => {    // this map comes from RXJS
         switch (dbType) {
           case "mongo": {
-            this.studentsMongo = this.studentsMongo.filter(s => s.id != id);
-            console.log("mongo students UI updated");
-            this.mongoStudentsChanged.next();
+            this.teachersMongo = this.teachersMongo.filter(s => s.id != id);
+            console.log("mongo teachers UI updated");
+            this.mongoTeachersChanged.next();
             break;
           }
           case "mysql": {
-            this.studentsMysql = this.studentsMysql.filter(s => s.id != id);
-            this.mysqlStudentsChanged.next();
+            this.teachersMysql = this.teachersMysql.filter(s => s.id != id);
+            this.mysqlTeachersChanged.next();
             break;
           }
         }

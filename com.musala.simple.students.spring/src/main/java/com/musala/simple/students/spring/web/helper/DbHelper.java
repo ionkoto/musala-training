@@ -14,10 +14,10 @@ import com.musala.simple.students.spring.web.database.DatabaseFactory;
 import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
 import com.musala.simple.students.spring.web.internal.ErrorMessage;
-import com.musala.simple.students.spring.web.student.Student;
-import com.musala.simple.students.spring.web.student.StudentDataPrinter;
-import com.musala.simple.students.spring.web.student.StudentGroup;
-import com.musala.simple.students.spring.web.student.StudentWrapper;
+import com.musala.simple.students.spring.web.models.student.Student;
+import com.musala.simple.students.spring.web.models.student.StudentDataPrinter;
+import com.musala.simple.students.spring.web.models.student.StudentGroup;
+import com.musala.simple.students.spring.web.models.student.StudentWrapper;
 
 /**
  * This is a helper class for performing predefined actions on a database and

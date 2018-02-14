@@ -1,4 +1,4 @@
-package com.musala.simple.students.spring.web.student;
+package com.musala.simple.students.spring.web.models.student;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.musala.simple.students.spring.web.student;
+package com.musala.simple.students.spring.web.models.student;
 
 /**
  * The class represents a blueprint for storing data about a student - id, name,

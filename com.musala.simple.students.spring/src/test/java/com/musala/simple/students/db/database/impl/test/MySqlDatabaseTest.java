@@ -18,7 +18,7 @@ import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.database.impl.MySqlDatabase;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
 import com.musala.simple.students.spring.web.internal.ErrorMessage;
-import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.models.student.Student;
 
 import ch.vorburger.exec.ManagedProcessException;
 import ch.vorburger.mariadb4j.DB;

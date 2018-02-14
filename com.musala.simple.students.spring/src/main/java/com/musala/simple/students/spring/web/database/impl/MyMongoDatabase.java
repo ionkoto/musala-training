@@ -16,17 +16,18 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.musala.simple.students.spring.web.database.AbstractDatabase;
-import com.musala.simple.students.spring.web.database.DatabaseCommands;
-import com.musala.simple.students.spring.web.dbevents.DbEvents;
+import com.musala.simple.students.spring.web.database.DatabaseStudentCommands;
+import com.musala.simple.students.spring.web.dbevents.DbEventsStudents;
 import com.musala.simple.students.spring.web.dbevents.Event;
-import com.musala.simple.students.spring.web.dbevents.EventLogger;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
+import com.musala.simple.students.spring.web.exception.TeacherNotFoundException;
 import com.musala.simple.students.spring.web.internal.ErrorMessage;
 import com.musala.simple.students.spring.web.internal.InfoMessage;
-import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.models.student.Student;
+import com.musala.simple.students.spring.web.models.teacher.Teacher;
 
 /**
- * MongoDb implementation of the {@link DatabaseCommands} interface.
+ * MongoDb implementation of the {@link DatabaseStudentCommands} interface.
  * 
  * @author yoan.petrushinov
  *
@@ -134,17 +135,17 @@ public class MyMongoDatabase extends AbstractDatabase {
         }
         try {
             this.studentsCollection.insertOne(newStudent);
-            this.registerEvent(new Event(DbEvents.AddStudentSuccessMongo.getMessage(), DbEvents.AddStudentSuccessMongo.getCode(),
+            this.registerEvent(new Event(DbEventsStudents.AddStudentSuccessMongo.getMessage(), DbEventsStudents.AddStudentSuccessMongo.getCode(),
                     System.currentTimeMillis()));
             return true;
         } catch (MongoWriteException e) {
             if (e.getMessage().startsWith(DB_DUPLICATE_ENTRY_ATTEMPT_ERROR_ID)) {
                 getLogger().error(
                         String.format(STUDEND_ADD_FAIL_DUPLICATE_ID, student.getName(), student.getId()) + CURRENT_DB);
-                this.registerEvent(new Event(DbEvents.AddDuplicateStudentFail.getMessage(),
-                        DbEvents.AddDuplicateStudentFail.getCode(), System.currentTimeMillis()));
+                this.registerEvent(new Event(DbEventsStudents.AddDuplicateStudentFail.getMessage(),
+                        DbEventsStudents.AddDuplicateStudentFail.getCode(), System.currentTimeMillis()));
             } else {
-                this.registerEvent(new Event(DbEvents.AddStudentFail.getMessage(), DbEvents.AddStudentFail.getCode(),
+                this.registerEvent(new Event(DbEventsStudents.AddStudentFail.getMessage(), DbEventsStudents.AddStudentFail.getCode(),
                         System.currentTimeMillis()));
                 getLogger().error(String.format(STUDENT_ADD_FAIL, student.getName(), student.getId()) + CURRENT_DB);
                 getLogger().error("Stacktrace:", e);
@@ -168,14 +169,14 @@ public class MyMongoDatabase extends AbstractDatabase {
         query = this.studentsCollection.find(query).first();
 
         if (query == null) {
-            this.registerEvent(new Event(DbEvents.DeleteStudentFail.getMessage(), DbEvents.DeleteStudentFail.getCode(),
+            this.registerEvent(new Event(DbEventsStudents.DeleteStudentFail.getMessage(), DbEventsStudents.DeleteStudentFail.getCode(),
                     System.currentTimeMillis()));
             throw new StudentNotFoundException(ErrorMessage.STUDENT_NOT_EXISTS + CURRENT_DB);
         }
 
         this.studentsCollection.deleteOne(query);
-        this.registerEvent(new Event(DbEvents.DeleteStudentSuccessMongo.getMessage(),
-                DbEvents.DeleteStudentSuccessMongo.getCode(), System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsStudents.DeleteStudentSuccessMongo.getMessage(),
+                DbEventsStudents.DeleteStudentSuccessMongo.getCode(), System.currentTimeMillis()));
         getLogger().info(String.format(InfoMessage.STUDENT_DELETE_SUCCESS, studentId) + CURRENT_DB);
     }
 
@@ -196,14 +197,14 @@ public class MyMongoDatabase extends AbstractDatabase {
         query = this.studentsCollection.find(query).first();
 
         if (query == null) {
-            this.registerEvent(new Event(DbEvents.GetStudentFail.getMessage(), 
-                    DbEvents.GetStudentFail.getCode(), 
+            this.registerEvent(new Event(DbEventsStudents.GetStudentFail.getMessage(), 
+                    DbEventsStudents.GetStudentFail.getCode(), 
                     System.currentTimeMillis()));
             throw new StudentNotFoundException(ErrorMessage.STUDENT_NOT_EXISTS + CURRENT_DB);
         }
 
-        this.registerEvent(new Event(DbEvents.GetStudentSuccess.getMessage(), 
-                DbEvents.GetStudentSuccess.getCode(), 
+        this.registerEvent(new Event(DbEventsStudents.GetStudentSuccess.getMessage(), 
+                DbEventsStudents.GetStudentSuccess.getCode(), 
                 System.currentTimeMillis()));
         return constructStudentObject(query);
     }
@@ -249,13 +250,13 @@ public class MyMongoDatabase extends AbstractDatabase {
                 studentsList.add(student);
             }
         } catch (MongoException e) {
-            this.registerEvent(new Event(DbEvents.GetStudentsFail.getMessage(), 
-                    DbEvents.GetStudentsFail.getCode(), 
+            this.registerEvent(new Event(DbEventsStudents.GetStudentsFail.getMessage(), 
+                    DbEventsStudents.GetStudentsFail.getCode(), 
                     System.currentTimeMillis()));
         }
         getLogger().info(InfoMessage.STUDENT_GET_ALL_SUCCESS + CURRENT_DB);
-        this.registerEvent(new Event(DbEvents.GetStudentsSuccess.getMessage(), 
-                DbEvents.GetStudentsSuccess.getCode(), 
+        this.registerEvent(new Event(DbEventsStudents.GetStudentsSuccess.getMessage(), 
+                DbEventsStudents.GetStudentsSuccess.getCode(), 
                 System.currentTimeMillis()));
         return studentsList.toArray(new Student[studentsList.size()]);
     }
@@ -288,8 +289,8 @@ public class MyMongoDatabase extends AbstractDatabase {
         for (Student student : students) {
             this.addStudent(student);
         }
-        this.registerEvent(new Event(DbEvents.AddMultipleSuccess.getMessage(), 
-                DbEvents.AddMultipleSuccess.getCode(), 
+        this.registerEvent(new Event(DbEventsStudents.AddMultipleSuccess.getMessage(), 
+                DbEventsStudents.AddMultipleSuccess.getCode(), 
                 System.currentTimeMillis()));
     }
 
@@ -307,5 +308,47 @@ public class MyMongoDatabase extends AbstractDatabase {
     public void addMultipleStudents(Student[] students) {
         List<Student> studentsList = Arrays.asList(students);
         this.addMultipleStudents(studentsList);
+    }
+
+    @Override
+    public boolean addTeacher(Teacher teacher) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void addMultipleTeachers(List<Teacher> teachers) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addMultipleTeachers(Teacher[] teachers) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteTeacherById(int teacherId) throws TeacherNotFoundException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Teacher getTeacherById(int teacherId) throws TeacherNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Teacher[] getAllTeachersArr() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Teacher> getAllTeachersList() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

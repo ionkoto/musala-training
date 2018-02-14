@@ -3,29 +3,21 @@ package com.musala.simple.students.spring.web;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.musala.simple.students.spring.web.database.AbstractDatabase;
 import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
-import com.musala.simple.students.spring.web.helper.DbHelper;
-import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.models.student.Student;
 
 /**
  * This is a Service class acting as a middle layer between REST endpoints and the database/backend,
- * providing methods for database interactions.
+ * providing methods for database interactions with student entities.
  * 
  * @author yoan.petrushinov
  *
  */
-public class StudentService {
-
-    private static AbstractDatabase mongoDb;
-    private static AbstractDatabase mySqlDb;
-
-    public static void establishDbConnection() {
-        mongoDb = DbHelper.initializeDatabase(DatabaseType.MongoDb);
-        mySqlDb = DbHelper.initializeDatabase(DatabaseType.MySQL);
-    }
-
+public class StudentService extends DbService{
+    
+    private StudentService() {}
+    
     public static boolean addStudent(Student student, DatabaseType dbType) {
         switch (dbType) {
             case MySQL:

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.musala.simple.students.spring.web.StudentService;
+import com.musala.simple.students.spring.web.DbService;
 
 @SpringBootApplication
 public class Main {
@@ -14,7 +14,7 @@ public class Main {
     private static Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        StudentService.establishDbConnection();
+        DbService.establishDbConnection();
         logger.info(DB_CONNECTION_SUCCESS);
         SpringApplication.run(Main.class, args);
         logger.info(SPRING_BOOT_START_SUCCESS);

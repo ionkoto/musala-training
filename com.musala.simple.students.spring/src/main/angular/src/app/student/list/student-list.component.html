@@ -28,7 +28,7 @@
           </tr>
         </thead>
         <tbody class="students" id='mongo-tbody'>
-          <tr *ngFor="let student of mongoStudentsToShow" app-item [student]="student" app-item [dbType]="'mongo'"></tr>
+          <tr *ngFor="let student of mongoStudentsToShow" student-item [student]="student" student-item [dbType]="'mongo'"></tr>
           <router-outlet></router-outlet>
         </tbody>
       </table>
@@ -48,7 +48,7 @@
           </tr>
         </thead>
         <tbody class="students" id='mysql-tbody'>
-          <tr *ngFor="let student of mysqlStudentsToShow" app-item [student]="student" app-item [dbType]="'mysql'"></tr>
+          <tr *ngFor="let student of mysqlStudentsToShow" student-item [student]="student" student-item [dbType]="'mysql'"></tr>
           <router-outlet></router-outlet>
         </tbody>
       </table>

@@ -11,16 +11,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.musala.simple.students.spring.web.database.AbstractDatabase;
-import com.musala.simple.students.spring.web.database.DatabaseCommands;
-import com.musala.simple.students.spring.web.dbevents.DbEvents;
+import com.musala.simple.students.spring.web.database.DatabaseStudentCommands;
+import com.musala.simple.students.spring.web.dbevents.DbEventsStudents;
+import com.musala.simple.students.spring.web.dbevents.DbEventsTeachers;
 import com.musala.simple.students.spring.web.dbevents.Event;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
+import com.musala.simple.students.spring.web.exception.TeacherNotFoundException;
 import com.musala.simple.students.spring.web.internal.ErrorMessage;
 import com.musala.simple.students.spring.web.internal.InfoMessage;
-import com.musala.simple.students.spring.web.student.Student;
+import com.musala.simple.students.spring.web.models.student.Student;
+import com.musala.simple.students.spring.web.models.teacher.Teacher;
 
 /**
- * MongoDb implementation of the {@link DatabaseCommands} interface.
+ * MongoDb implementation of the {@link DatabaseStudentCommands} interface.
  * 
  * @author yoan.petrushinov
  *
@@ -30,25 +33,35 @@ public class MySqlDatabase extends AbstractDatabase {
     private static final String NAME = "name";
     private static final String AGE = "age";
     private static final String GRADE = "grade";
+    private static final String EMAIL = "email";
     private static final String CURRENT_DB = " Database: MySql";
 
     private static final String DATABASE_URL = "%s%s:%d/%s";
     private static final String GET_STUDENT_STATEMENT = "SELECT * FROM students WHERE id = %d";
+    private static final String GET_TEACHER_STATEMENT = "SELECT * FROM teachers WHERE id = %d";
     private static final String GET_ALL_STUDENTS_STATEMENT = "SELECT * FROM students";
-    private static final String INSERT_STUDENT_STATEMENT = "INSERT INTO students (" + " id," + " name," + " age,"
-            + " grade ) VALUES (" + "?, ?, ?, ?)";
+    private static final String GET_ALL_TEACHERS_STATEMENT = "SELECT * FROM teachers";
+    private static final String INSERT_STUDENT_STATEMENT = 
+            "INSERT INTO students (" + " id," + " name," + " age, grade ) VALUES (" + "?, ?, ?, ?)";
+    private static final String INSERT_TEACHER_STATEMENT = 
+            "INSERT INTO teachers (" + " id," + " name," + " email ) VALUES (" + "?, ?, ?)";
     private static final String DELETE_STUDENT_STATEMENT = "DELETE FROM students where id = ?";
+    private static final String DELETE_TEACHER_STATEMENT = "DELETE FROM teachers where id = ?";
 
     private static final String DUPLICATE_ENTRY_ERROR = "Duplicate entry";
     private static final String STUDEND_ADD_FAIL_DUPLICATE_ID = "Student %s with id %d can not be added to the database. Student with the same id already exists\n";
-    private static final String STUDENT_ADD_FAIL = "Problem occured while trying to add %s with id %d to the database.\n";
+    private static final String TEACHER_ADD_FAIL_DUPLICATE_ID = "Teacher %s with id %d can not be added to the database. Teacher with the same id already exists\n";
+    private static final String STUDENT_ADD_FAIL = "Problem occured while trying to add student %s with id %d to the database.\n";
+    private static final String TEACHER_ADD_FAIL = "Problem occured while trying to add teacher %s with id %d to the database.\n";
     private static final String STUDENT_GET_FAIL = "Problem occured while trying to find student with id %d in the database.\n";
+    private static final String TEACHER_GET_FAIL = "Problem occured while trying to find teacher with id %d in the database.\n";
     private static final String BASE_URL = "jdbc:mysql://";
     private static final String LOCALHOST_URL = "jdbc:mysql://localhost";
     private static final String CREATE_STUDENTS_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS students "
             + "(id INTEGER not NULL, " + " name VARCHAR(50), " + " age INTEGER, " + " grade INTEGER, "
             + " PRIMARY KEY ( id ))";
-
+    private static final String CREATE_TEACHERS_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS teachers "
+            + "(id INTEGER not NULL, " + " name VARCHAR(50), " + " email VARCHAR(50), " + " PRIMARY KEY ( id ))";
     private Connection connection;
     private static MySqlDatabase singleton;
 
@@ -82,6 +95,11 @@ public class MySqlDatabase extends AbstractDatabase {
             // create Table students if doesn't exist
             stmt = this.connection.prepareStatement(CREATE_STUDENTS_TABLE_STATEMENT);
             stmt.execute();
+            
+         // create Table teachers if doesn't exist
+            stmt = this.connection.prepareStatement(CREATE_TEACHERS_TABLE_STATEMENT);
+            stmt.execute();
+            
             stmt.close();
             getLogger().info(InfoMessage.DATABASE_CONNECTION_SUCCESS + CURRENT_DB);
         } catch (SQLException e) {
@@ -109,18 +127,18 @@ public class MySqlDatabase extends AbstractDatabase {
 
             st.executeUpdate();
             st.close();
-            this.registerEvent(new Event(DbEvents.AddStudentSuccessMySql.getMessage(), DbEvents.AddStudentSuccessMySql.getCode(),
+            this.registerEvent(new Event(DbEventsStudents.AddStudentSuccessMySql.getMessage(), DbEventsStudents.AddStudentSuccessMySql.getCode(),
                     System.currentTimeMillis()));
             return true;
         } catch (SQLException e) {
 
             if (e.getMessage().contains(DUPLICATE_ENTRY_ERROR)) {
-                this.registerEvent(new Event(DbEvents.AddDuplicateStudentFail.getMessage(),
-                        DbEvents.AddDuplicateStudentFail.getCode(), System.currentTimeMillis()));
+                this.registerEvent(new Event(DbEventsStudents.AddDuplicateStudentFail.getMessage(),
+                        DbEventsStudents.AddDuplicateStudentFail.getCode(), System.currentTimeMillis()));
                 getLogger().error(
                         String.format(STUDEND_ADD_FAIL_DUPLICATE_ID, student.getName(), student.getId()) + CURRENT_DB);
             } else {
-                this.registerEvent(new Event(DbEvents.AddStudentFail.getMessage(), DbEvents.AddStudentFail.getCode(),
+                this.registerEvent(new Event(DbEventsStudents.AddStudentFail.getMessage(), DbEventsStudents.AddStudentFail.getCode(),
                         System.currentTimeMillis()));
                 getLogger().error(String.format(STUDENT_ADD_FAIL, student.getName(), student.getId()) + CURRENT_DB);
                 getLogger().error(e.toString());
@@ -144,7 +162,7 @@ public class MySqlDatabase extends AbstractDatabase {
         for (Student student : students) {
             this.addStudent(student);
         }
-        this.registerEvent(new Event(DbEvents.AddMultipleSuccess.getMessage(), DbEvents.AddMultipleSuccess.getCode(),
+        this.registerEvent(new Event(DbEventsStudents.AddMultipleSuccess.getMessage(), DbEventsStudents.AddMultipleSuccess.getCode(),
                 System.currentTimeMillis()));
     }
 
@@ -181,10 +199,10 @@ public class MySqlDatabase extends AbstractDatabase {
             st.executeUpdate();
             getLogger().info(String.format(InfoMessage.STUDENT_DELETE_SUCCESS, studentId) + CURRENT_DB);
             st.close();
-            this.registerEvent(new Event(DbEvents.AddStudentSuccessMySql.getMessage(),
-                    DbEvents.AddStudentSuccessMySql.getCode(), System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsStudents.AddStudentSuccessMySql.getMessage(),
+                    DbEventsStudents.AddStudentSuccessMySql.getCode(), System.currentTimeMillis()));
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEvents.DeleteStudentFail.getMessage(), DbEvents.DeleteStudentFail.getCode(),
+            this.registerEvent(new Event(DbEventsStudents.DeleteStudentFail.getMessage(), DbEventsStudents.DeleteStudentFail.getCode(),
                     System.currentTimeMillis()));
             getLogger().error(ErrorMessage.STUDENT_NOT_EXISTS + CURRENT_DB);
             getLogger().error(e.toString());
@@ -214,12 +232,12 @@ public class MySqlDatabase extends AbstractDatabase {
                 throw new StudentNotFoundException(ErrorMessage.STUDENT_NOT_EXISTS + CURRENT_DB);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEvents.GetStudentFail.getMessage(), DbEvents.GetStudentFail.getCode(),
+            this.registerEvent(new Event(DbEventsStudents.GetStudentFail.getMessage(), DbEventsStudents.GetStudentFail.getCode(),
                     System.currentTimeMillis()));
             getLogger().error(String.format(STUDENT_GET_FAIL, sudentId) + CURRENT_DB);
             getLogger().error(e.toString());
         }
-        this.registerEvent(new Event(DbEvents.GetStudentSuccess.getMessage(), DbEvents.GetStudentsSuccess.getCode(),
+        this.registerEvent(new Event(DbEventsStudents.GetStudentSuccess.getMessage(), DbEventsStudents.GetStudentsSuccess.getCode(),
                 System.currentTimeMillis()));
         return student;
     }
@@ -245,13 +263,13 @@ public class MySqlDatabase extends AbstractDatabase {
                 studentsList.add(student);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEvents.GetStudentsFail.getMessage(), DbEvents.GetStudentsFail.getCode(),
+            this.registerEvent(new Event(DbEventsStudents.GetStudentsFail.getMessage(), DbEventsStudents.GetStudentsFail.getCode(),
                     System.currentTimeMillis()));
             getLogger().error(e.toString());
         }
 
         getLogger().info(InfoMessage.STUDENT_GET_ALL_SUCCESS + CURRENT_DB);
-        this.registerEvent(new Event(DbEvents.GetStudentsSuccess.getMessage(), DbEvents.GetStudentsSuccess.getCode(),
+        this.registerEvent(new Event(DbEventsStudents.GetStudentsSuccess.getMessage(), DbEventsStudents.GetStudentsSuccess.getCode(),
                 System.currentTimeMillis()));
         return studentsList.toArray(new Student[studentsList.size()]);
     }
@@ -285,5 +303,201 @@ public class MySqlDatabase extends AbstractDatabase {
         int age = rs.getInt(AGE);
         int grade = rs.getInt(GRADE);
         return new Student(id, name, age, grade);
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#addTeacher(Teacher)} method. Executes an SQL statement
+     * to create a new entry in the 'teachers' table using the attributes of the
+     * {@link Teacher} object provided as a parameter. The method handles attempts for
+     * duplicate additions.
+     * 
+     */
+    @Override
+    public boolean addTeacher(Teacher teacher) {
+        try {
+            PreparedStatement st = this.connection.prepareStatement(INSERT_TEACHER_STATEMENT);
+
+            st.setInt(1, teacher.getId());
+            st.setString(2, teacher.getName());
+            st.setString(3, teacher.getEmail());
+
+            st.executeUpdate();
+            st.close();
+            this.registerEvent(new Event(DbEventsTeachers.AddTeacherSuccessMySql.getMessage(), DbEventsTeachers.AddTeacherSuccessMySql.getCode(),
+                    System.currentTimeMillis()));
+            return true;
+        } catch (SQLException e) {
+
+            if (e.getMessage().contains(DUPLICATE_ENTRY_ERROR)) {
+                this.registerEvent(new Event(DbEventsTeachers.AddDuplicateTeacherFail.getMessage(),
+                        DbEventsTeachers.AddDuplicateTeacherFail.getCode(), System.currentTimeMillis()));
+                getLogger().error(
+                        String.format(TEACHER_ADD_FAIL_DUPLICATE_ID, teacher.getName(), teacher.getId()) + CURRENT_DB);
+            } else {
+                this.registerEvent(new Event(DbEventsTeachers.AddTeacherFail.getMessage(), DbEventsTeachers.AddTeacherFail.getCode(),
+                        System.currentTimeMillis()));
+                getLogger().error(String.format(TEACHER_ADD_FAIL, teacher.getName(), teacher.getId()) + CURRENT_DB);
+                getLogger().error(e.toString());
+            }
+        }
+        return false;
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#addMultipleTeachers(List<Teacher> teachers)} method.
+     * Iterates over the List<Teacher> parameter and calls the
+     * {@link MySqlDatabase#addTeacher(Teacher)} method for each Teacher object.
+     * 
+     * @param teachers
+     *            a List containing multiple {@link Teacher} objects to be added to
+     *            the database
+     */
+    @Override
+    public void addMultipleTeachers(List<Teacher> teachers) {
+        for (Teacher teacher : teachers) {
+            this.addTeacher(teacher);
+        }
+        this.registerEvent(new Event(DbEventsTeachers.AddMultipleSuccess.getMessage(), DbEventsTeachers.AddMultipleSuccess.getCode(),
+                System.currentTimeMillis()));
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#addMultipleTeachers(Teacher[] teachers)} method.
+     * Casts the {@link Teacher} array to a List and calls the
+     * {@link MySqlDatabase#addMultipleTeachers(List)} method with it.
+     * 
+     * @param teachers
+     *            an Array containing multiple {@link Teacher} objects to be added
+     *            to the database
+     */
+    @Override
+    public void addMultipleTeachers(Teacher[] teachers) {
+        List<Teacher> teachersList = Arrays.asList(teachers);
+        this.addMultipleTeachers(teachersList);
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#deleteTeacherById(int)()} method. Executes a delete
+     * sql statement on an entry by given id. Throws an exception if entry with the
+     * given id does not exist.
+     * 
+     * @param teacherId
+     *            the id to find a teacher in the database
+     */
+    @Override
+    public void deleteTeacherById(int teacherId) throws TeacherNotFoundException {
+        try {
+            PreparedStatement st = this.connection.prepareStatement(DELETE_TEACHER_STATEMENT);
+            st.setInt(1, teacherId);
+            st.executeUpdate();
+            getLogger().info(String.format(InfoMessage.TEACHER_DELETE_SUCCESS, teacherId) + CURRENT_DB);
+            st.close();
+            this.registerEvent(new Event(DbEventsTeachers.AddTeacherSuccessMySql.getMessage(),
+                    DbEventsTeachers.AddTeacherSuccessMySql.getCode(), System.currentTimeMillis()));
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsTeachers.DeleteTeacherFail.getMessage(), DbEventsTeachers.DeleteTeacherFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(ErrorMessage.TEACHER_NOT_EXISTS + CURRENT_DB);
+            getLogger().error(e.toString());
+        }
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#getTeacherById()} method. Executes sql SELECT
+     * statement with the provided ID and if entry found creates a new {@link Teacher}
+     * object with the entry's data and returns it. Else throws an exception.
+     * 
+     * @param teacherId
+     *            the id to find a teacher in the database
+     * @return a Teacher object with id, name and email
+     */
+    @Override
+    public Teacher getTeacherById(int teacherId) throws TeacherNotFoundException {
+        String query = String.format(GET_TEACHER_STATEMENT, teacherId);
+        Teacher teacher = null;
+        try (Statement statement = this.connection.createStatement();) {
+            ResultSet rs = statement.executeQuery(query);
+
+            if (rs.next()) {
+                teacher = constructTeacherObject(rs);
+            } else {
+                throw new TeacherNotFoundException(ErrorMessage.TEACHER_NOT_EXISTS + CURRENT_DB);
+            }
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsTeachers.GetTeacherFail.getMessage(), DbEventsTeachers.GetTeacherFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(String.format(TEACHER_GET_FAIL, teacherId) + CURRENT_DB);
+            getLogger().error(e.toString());
+        }
+        this.registerEvent(new Event(DbEventsTeachers.GetTeacherSuccess.getMessage(), DbEventsTeachers.GetTeachersSuccess.getCode(),
+                System.currentTimeMillis()));
+        return teacher;
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#getAllTeachersArr()} method. Executes a SELECT sql
+     * statement to retrieve all the entries in the 'teachers' table. Iterates the
+     * entries and constructs {@link Teacher} objects with the data. Each object gets
+     * added to a List<Teacher> and the list is returned in the end (cast to an array).
+     * 
+     * @return a Teacher[] array
+     */
+    @Override
+    public Teacher[] getAllTeachersArr() {
+        List<Teacher> teachersList = new ArrayList<>();
+        try (Statement statement = this.connection.createStatement()) {
+
+            ResultSet rs = statement.executeQuery(GET_ALL_TEACHERS_STATEMENT);
+
+            while (rs.next()) {
+                Teacher teacher = constructTeacherObject(rs);
+                teachersList.add(teacher);
+            }
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsTeachers.GetTeachersFail.getMessage(), DbEventsTeachers.GetTeachersFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(e.toString());
+        }
+
+        getLogger().info(InfoMessage.TEACHER_GET_ALL_SUCCESS + CURRENT_DB);
+        this.registerEvent(new Event(DbEventsTeachers.GetTeachersSuccess.getMessage(), DbEventsTeachers.GetTeachersSuccess.getCode(),
+                System.currentTimeMillis()));
+        return teachersList.toArray(new Teacher[teachersList.size()]);
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#getAllTeachersList()} method. Calls the
+     * {@link MySqlDatabase#getAllTeachersArr()} and casts the returned array to a
+     * List<Teacher> and returns it.
+     * 
+     * @return a List<Teacher> all teachers in a List
+     */
+    @Override
+    public List<Teacher> getAllTeachersList() {
+        return Arrays.asList(this.getAllTeachersArr());
+    }
+    
+    /**
+     * Casts all the values of the ResultSet to the corresponding data types and
+     * passes them to the {@link Teacher} constructor to create a new object and
+     * then returns that object.
+     * 
+     * @param rs
+     *            The ResultSet containing the Teacher's information in a database
+     *            format.
+     * @return the new Teacher object
+     */
+    private Teacher constructTeacherObject(ResultSet rs) throws SQLException {
+        String name = rs.getString(NAME);
+        int id = rs.getInt(ID);
+        String email = rs.getString(EMAIL);
+        return new Teacher(id, name, email);
     }
 }

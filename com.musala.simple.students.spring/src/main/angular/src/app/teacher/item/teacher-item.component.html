@@ -1,0 +1,16 @@
+<td *ngFor='let key of objectKeys(teacher)'>{{teacher[key]}}</td>
+<td>
+  <button type="button" class="btn btn-primary details" routerLink="{{dbType}}/{{teacher.id}}/details">Details</button>
+</td>
+<td>
+  <button type="button" class="btn btn-danger delete" (click)="openModal(template)">Delete</button>
+</td>
+
+<ng-template #template class="template">
+  <div class="modal-body text-center confirmAnalog">
+    <p id="analog-question">Are you sure you want to delete this teacher?</p>
+    <p>Name: {{teacher.name}}, ID: {{teacher.id}}</p>
+    <button type="button" class="btn btn-default" (click)="confirmDelete(teacher.id, dbType)">Yes</button>
+    <button type="button" class="btn btn-primary" (click)="decline()">No</button>
+  </div>
+</ng-template>

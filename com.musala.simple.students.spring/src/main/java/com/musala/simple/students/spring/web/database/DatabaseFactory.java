@@ -10,7 +10,7 @@ import com.musala.simple.students.spring.web.database.impl.MySqlDatabase;
 import com.musala.simple.students.spring.web.internal.InfoMessage;
 
 /**
- * This is a Factory class for creating {@link DatabaseCommands} objects. The
+ * This is a Factory class for creating {@link DatabaseStudentCommands} objects. The
  * constructor requires the database properties to be provided in the form of a
  * {@link Properties} object passed to the constructor along with the database
  * type {@link DatabaseType} enum.

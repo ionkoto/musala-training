@@ -1,16 +1,16 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
-import { StudentsService } from "../students.service";
+import { StudentsService } from "../../students.service";
 import { Router } from '@angular/router';
 
 import { Subscription } from "rxjs/Subscription";
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
-  selector: '[app-item]',
-  templateUrl: './item.component.html',
-  styleUrls: ['./item.component.css']
+  selector: '[student-item]',
+  templateUrl: './student-item.component.html',
+  styleUrls: ['./student-item.component.css']
 })
-export class ItemComponent {
+export class StudentItemComponent {
   @Input("student") student;
   @Input("dbType") dbType;
   objectKeys = Object.keys;

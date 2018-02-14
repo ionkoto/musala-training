@@ -1,4 +1,4 @@
-package com.musala.simple.students.spring.web.student;
+package com.musala.simple.students.spring.web.models.student;
 
 /**
  * This is a helper class used to parse a JSON array of students. The user of
