@@ -1,10 +1,9 @@
-import {Component, Input, OnInit, TemplateRef} from '@angular/core';
-import {StudentsService} from "../students.service";
+import { Component, Input, OnInit, TemplateRef } from '@angular/core';
+import { StudentsService } from "../students.service";
 import { Router } from '@angular/router';
 
-import {Subscription} from "rxjs/Subscription";
-import { BsModalService } from 'ngx-bootstrap/modal';
-import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
+import { Subscription } from "rxjs/Subscription";
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: '[app-item]',
@@ -27,13 +26,13 @@ export class ItemComponent {
   }
 
   openModal(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template, {class: 'modal-sm'});
+    this.modalRef = this.modalService.show(template, { class: 'modal-sm' });
   }
 
   confirmDelete(id, dbType): void {
     this.studentsService
-    .deleteStudentById(id, dbType)
-    .subscribe(
+      .deleteStudentById(id, dbType)
+      .subscribe(
       res => {
         this.message = 'Confirmed!';
         this.modalRef.hide();
@@ -41,13 +40,11 @@ export class ItemComponent {
       err => {
         console.log(err);
         this.message = 'Server Error!';
-      }
-    );
+      });
   }
- 
+
   decline(): void {
     this.message = 'Declined!';
     this.modalRef.hide();
   }
-
 }

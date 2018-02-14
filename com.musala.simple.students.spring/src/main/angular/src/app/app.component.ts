@@ -5,7 +5,8 @@ import { Observable } from 'rxjs/Rx';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [StudentsService]
 })
 export class AppComponent implements OnInit {
   title = 'app';
@@ -13,12 +14,12 @@ export class AppComponent implements OnInit {
   events = [];
   lastMysqlChangeTimestamp = (new Date).getTime();
   lastMongoChangeTimestamp = (new Date).getTime();
+  stopPooling = false;
 
   constructor(studentsService: StudentsService) {
     this.studentsService = studentsService;
   }
-
-  stopPooling = false;
+  
   public startPooling() {
     var timer = Observable.timer(0, 5000);
     var self = this;
@@ -56,6 +57,7 @@ export class AppComponent implements OnInit {
         const addDeleteCodeMongo = 2;
         const addDeleteCodeMysql = 1;
 
+        // check if last event in local events is same as last event in newly fetched events
         if (this.events[lastEventIndex]["timestamp"] !== incomingEvents[lastEventIndexIncoming]["timestamp"]) {
 
           for (let event of incomingEvents) {
@@ -68,7 +70,6 @@ export class AppComponent implements OnInit {
                   this.lastMongoChangeTimestamp = event["timestamp"];
                   this.studentsService.fetchStudents("mongo");
                 }
-
               } else if (dbChanged == addDeleteCodeMysql) {
                 //mysqldb change
                 if (this.lastMysqlChangeTimestamp < parseInt(event["timestamp"])) {

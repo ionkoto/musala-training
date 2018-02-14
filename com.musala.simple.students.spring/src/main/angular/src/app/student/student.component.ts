@@ -25,7 +25,7 @@ export class StudentComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription = this.activatedRoute.params.subscribe(params => {
-      this.id = +params['id'];
+      this.id = parseInt(params['id']);
       this.dbType = params['dbType'];
       this.loadStudentDetails(this.id, this.dbType);
     });
@@ -41,8 +41,7 @@ export class StudentComponent implements OnInit, OnDestroy {
       },
       err => {
         console.log(err);
-      }
-      );
+      });
   }
 
   ngOnDestroy() {

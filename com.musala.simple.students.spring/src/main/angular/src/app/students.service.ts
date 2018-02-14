@@ -69,7 +69,7 @@ addStudent(newStudent, dbType) : Observable < Object > {
       }
       return response.json();
     })
-    .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+    .catch((error: any) => Observable.throw(error.json()|| 'Server error'));
 }
 
 getStudents(dbType) {

@@ -3,6 +3,7 @@ import {RouterModule} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
 import { AddStudentComponent } from "./add-student.component";
+import { ToasterModule, ToasterService } from 'angular2-toaster';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,9 @@ import { AddStudentComponent } from "./add-student.component";
     RouterModule.forChild([
       { path: '', component: AddStudentComponent }
     ]),
-    FormsModule
+    FormsModule,
+    ToasterModule,
+    ToasterModule.forRoot()
   ]
 })
 export class AddStudentModule {}
