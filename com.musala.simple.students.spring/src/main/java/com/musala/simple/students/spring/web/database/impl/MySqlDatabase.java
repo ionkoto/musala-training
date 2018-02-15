@@ -12,13 +12,16 @@ import java.util.List;
 
 import com.musala.simple.students.spring.web.database.AbstractDatabase;
 import com.musala.simple.students.spring.web.database.DatabaseStudentCommands;
+import com.musala.simple.students.spring.web.dbevents.DbEventsCourses;
 import com.musala.simple.students.spring.web.dbevents.DbEventsStudents;
 import com.musala.simple.students.spring.web.dbevents.DbEventsTeachers;
 import com.musala.simple.students.spring.web.dbevents.Event;
+import com.musala.simple.students.spring.web.exception.CourseNotFoundException;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
 import com.musala.simple.students.spring.web.exception.TeacherNotFoundException;
 import com.musala.simple.students.spring.web.internal.ErrorMessage;
 import com.musala.simple.students.spring.web.internal.InfoMessage;
+import com.musala.simple.students.spring.web.models.course.Course;
 import com.musala.simple.students.spring.web.models.student.Student;
 import com.musala.simple.students.spring.web.models.teacher.Teacher;
 
@@ -39,22 +42,33 @@ public class MySqlDatabase extends AbstractDatabase {
     private static final String DATABASE_URL = "%s%s:%d/%s";
     private static final String GET_STUDENT_STATEMENT = "SELECT * FROM students WHERE id = %d";
     private static final String GET_TEACHER_STATEMENT = "SELECT * FROM teachers WHERE id = %d";
+    private static final String GET_COURSE_STATEMENT = "SELECT * FROM courses WHERE id = %d";
     private static final String GET_ALL_STUDENTS_STATEMENT = "SELECT * FROM students";
     private static final String GET_ALL_TEACHERS_STATEMENT = "SELECT * FROM teachers";
+    private static final String GET_ALL_COURSES_STATEMENT = "SELECT * FROM courses";
     private static final String INSERT_STUDENT_STATEMENT = 
             "INSERT INTO students (" + " id," + " name," + " age, grade ) VALUES (" + "?, ?, ?, ?)";
     private static final String INSERT_TEACHER_STATEMENT = 
             "INSERT INTO teachers (" + " id," + " name," + " email ) VALUES (" + "?, ?, ?)";
+    private static final String INSERT_COURSE_STATEMENT = 
+            "INSERT INTO courses (" + " id," + " name ) VALUES (" + "?, ?)";
+    private static final String GET_COURSE_STUDENTS_STATEMENT = "SELECT s.id, s.name, s.age, s.grade " + 
+            "FROM students s, students_courses " + 
+            "WHERE students_courses.courseId_FK = %d " + 
+            "AND students_courses.sudentId_FK = s.id";
     private static final String DELETE_STUDENT_STATEMENT = "DELETE FROM students where id = ?";
     private static final String DELETE_TEACHER_STATEMENT = "DELETE FROM teachers where id = ?";
-
+    private static final String DELETE_COURSE_STATEMENT = "DELETE FROM courses where id = ?";
     private static final String DUPLICATE_ENTRY_ERROR = "Duplicate entry";
     private static final String STUDEND_ADD_FAIL_DUPLICATE_ID = "Student %s with id %d can not be added to the database. Student with the same id already exists\n";
     private static final String TEACHER_ADD_FAIL_DUPLICATE_ID = "Teacher %s with id %d can not be added to the database. Teacher with the same id already exists\n";
+    private static final String COURSE_ADD_FAIL_DUPLICATE_ID = "Course %s with id %d can not be added to the database. Course with the same id already exists\n";
     private static final String STUDENT_ADD_FAIL = "Problem occured while trying to add student %s with id %d to the database.\n";
     private static final String TEACHER_ADD_FAIL = "Problem occured while trying to add teacher %s with id %d to the database.\n";
+    private static final String COURSE_ADD_FAIL = "Problem occured while trying to add course %s with id %d to the database.\n";
     private static final String STUDENT_GET_FAIL = "Problem occured while trying to find student with id %d in the database.\n";
     private static final String TEACHER_GET_FAIL = "Problem occured while trying to find teacher with id %d in the database.\n";
+    private static final String COURSE_GET_FAIL = "Problem occured while trying to find course with id %d in the database.\n";
     private static final String BASE_URL = "jdbc:mysql://";
     private static final String LOCALHOST_URL = "jdbc:mysql://localhost";
     private static final String CREATE_STUDENTS_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS students "
@@ -62,6 +76,8 @@ public class MySqlDatabase extends AbstractDatabase {
             + " PRIMARY KEY ( id ))";
     private static final String CREATE_TEACHERS_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS teachers "
             + "(id INTEGER not NULL, " + " name VARCHAR(50), " + " email VARCHAR(50), " + " PRIMARY KEY ( id ))";
+    private static final String CREATE_COURSES_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS coarses "
+            + "(id INTEGER not NULL, " + " name VARCHAR(50), " + " PRIMARY KEY ( id ))";
     private Connection connection;
     private static MySqlDatabase singleton;
 
@@ -98,6 +114,10 @@ public class MySqlDatabase extends AbstractDatabase {
             
          // create Table teachers if doesn't exist
             stmt = this.connection.prepareStatement(CREATE_TEACHERS_TABLE_STATEMENT);
+            stmt.execute();
+            
+         // create Table courses if doesn't exist
+            stmt = this.connection.prepareStatement(CREATE_COURSES_TABLE_STATEMENT);
             stmt.execute();
             
             stmt.close();
@@ -499,5 +519,232 @@ public class MySqlDatabase extends AbstractDatabase {
         int id = rs.getInt(ID);
         String email = rs.getString(EMAIL);
         return new Teacher(id, name, email);
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#addCourse(Course)} method. Executes an SQL statement
+     * to create a new entry in the 'courses' table using the attributes of the
+     * {@link Course} object provided as a parameter. The method handles attempts for
+     * duplicate additions.
+     * 
+     */
+    @Override
+    public boolean addCourse(Course course) {
+        try {
+            PreparedStatement st = this.connection.prepareStatement(INSERT_COURSE_STATEMENT);
+
+            st.setInt(1, course.getId());
+            st.setString(2, course.getName());
+
+            st.executeUpdate();
+            st.close();
+            this.registerEvent(new Event(DbEventsCourses.AddCourseSuccessMySql.getMessage(), DbEventsCourses.AddCourseSuccessMySql.getCode(),
+                    System.currentTimeMillis()));
+            return true;
+        } catch (SQLException e) {
+
+            if (e.getMessage().contains(DUPLICATE_ENTRY_ERROR)) {
+                this.registerEvent(new Event(DbEventsCourses.AddDuplicateCourseFail.getMessage(),
+                        DbEventsCourses.AddDuplicateCourseFail.getCode(), System.currentTimeMillis()));
+                getLogger().error(
+                        String.format(COURSE_ADD_FAIL_DUPLICATE_ID, course.getName(), course.getId()) + CURRENT_DB);
+            } else {
+                this.registerEvent(new Event(DbEventsCourses.AddCourseFail.getMessage(), DbEventsCourses.AddCourseFail.getCode(),
+                        System.currentTimeMillis()));
+                getLogger().error(String.format(COURSE_ADD_FAIL, course.getName(), course.getId()) + CURRENT_DB);
+                getLogger().error(e.toString());
+            }
+        }
+        return false;
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#addMultipleCourses(List<Course> courses)} method.
+     * Iterates over the List<Course> parameter and calls the
+     * {@link MySqlDatabase#addCourse(Course)} method for each Course object.
+     * 
+     * @param courses
+     *            a List containing multiple {@link Course} objects to be added to
+     *            the database
+     */
+    @Override
+    public void addMultipleCourses(List<Course> courses) {
+        for (Course course : courses) {
+            this.addCourse(course);
+        }
+        this.registerEvent(new Event(DbEventsCourses.AddMultipleSuccess.getMessage(), DbEventsCourses.AddMultipleSuccess.getCode(),
+                System.currentTimeMillis()));
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#addMultipleCourses(Course[] courses)} method.
+     * Casts the {@link Course} array to a List and calls the
+     * {@link MySqlDatabase#addMultipleCourses(List)} method with it.
+     * 
+     * @param courses
+     *            an Array containing multiple {@link Course} objects to be added
+     *            to the database
+     */
+    @Override
+    public void addMultipleCourses(Course[] courses) {
+        List<Course> coursesList = Arrays.asList(courses);
+        this.addMultipleCourses(coursesList);
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#deleteCourseById(int)()} method. Executes a delete
+     * sql statement on an entry by given id. Throws an exception if entry with the
+     * given id does not exist.
+     * 
+     * @param courseId
+     *            the id to find a course in the database
+     */
+    @Override
+    public void deleteCourseById(int courseId) throws CourseNotFoundException {
+        try {
+            PreparedStatement st = this.connection.prepareStatement(DELETE_COURSE_STATEMENT);
+            st.setInt(1, courseId);
+            st.executeUpdate();
+            getLogger().info(String.format(InfoMessage.COURSE_DELETE_SUCCESS, courseId) + CURRENT_DB);
+            st.close();
+            this.registerEvent(new Event(DbEventsCourses.AddCourseSuccessMySql.getMessage(),
+                    DbEventsCourses.AddCourseSuccessMySql.getCode(), System.currentTimeMillis()));
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsCourses.DeleteCourseFail.getMessage(), DbEventsCourses.DeleteCourseFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(ErrorMessage.COURSE_NOT_EXISTS + CURRENT_DB);
+            getLogger().error(e.toString());
+        }
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#getCourseById()} method. Executes sql SELECT
+     * statement with the provided ID and if entry found creates a new {@link Course}
+     * object with the entry's data and returns it. Else throws an exception.
+     * 
+     * @param courseId
+     *            the id to find a course in the database
+     * @return a Course object with id, name and email
+     */
+    @Override
+    public Course getCourseById(int courseId) throws CourseNotFoundException {
+        String query = String.format(GET_COURSE_STATEMENT, courseId);
+        Course course = null;
+        try (Statement statement = this.connection.createStatement();) {
+            ResultSet rs = statement.executeQuery(query);
+
+            if (rs.next()) {
+                course = constructCourseObject(rs);
+            } else {
+                throw new CourseNotFoundException(ErrorMessage.COURSE_NOT_EXISTS + CURRENT_DB);
+            }
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsCourses.GetCourseFail.getMessage(), DbEventsCourses.GetCourseFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(String.format(COURSE_GET_FAIL, courseId) + CURRENT_DB);
+            getLogger().error(e.toString());
+        }
+        this.registerEvent(new Event(DbEventsCourses.GetCourseSuccess.getMessage(), DbEventsCourses.GetCoursesSuccess.getCode(),
+                System.currentTimeMillis()));
+        return course;
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#getAllCoursesArr()} method. Executes a SELECT sql
+     * statement to retrieve all the entries in the 'courses' table. Iterates the
+     * entries and constructs {@link Course} objects with the data. Each object gets
+     * added to a List<Course> and the list is returned in the end (cast to an array).
+     * 
+     * @return a Course[] array
+     */
+    @Override
+    public Course[] getAllCoursesArr() {
+        List<Course> coursesList = new ArrayList<>();
+        try (Statement statement = this.connection.createStatement()) {
+
+            ResultSet rs = statement.executeQuery(GET_ALL_COURSES_STATEMENT);
+
+            while (rs.next()) {
+                Course course = constructCourseObject(rs);
+                coursesList.add(course);
+            }
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsCourses.GetCoursesFail.getMessage(), DbEventsCourses.GetCoursesFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(e.toString());
+        }
+
+        getLogger().info(InfoMessage.COURSE_GET_ALL_SUCCESS + CURRENT_DB);
+        this.registerEvent(new Event(DbEventsCourses.GetCoursesSuccess.getMessage(), DbEventsCourses.GetCoursesSuccess.getCode(),
+                System.currentTimeMillis()));
+        return coursesList.toArray(new Course[coursesList.size()]);
+    }
+
+    /**
+     * A MySql-specific implementation of the
+     * {@link AbstractDatabase#getAllCoursesList()} method. Calls the
+     * {@link MySqlDatabase#getAllCoursesArr()} and casts the returned array to a
+     * List<Course> and returns it.
+     * 
+     * @return a List<Course> all courses in a List
+     */
+    @Override
+    public List<Course> getAllCoursesList() {
+        return Arrays.asList(this.getAllCoursesArr());
+    }
+    
+    /**
+     * Casts all the values of the ResultSet to the corresponding data types and
+     * passes them to the {@link Course} constructor to create a new object and
+     * then returns that object.
+     * 
+     * @param rs
+     *            The ResultSet containing the Course's information in a database
+     *            format.
+     * @return the new Course object
+     */
+    private Course constructCourseObject(ResultSet rs) throws SQLException {
+        String name = rs.getString(NAME);
+        int id = rs.getInt(ID);
+        return new Course(id, name);
+    }
+
+    @Override
+    public List<Teacher> getCourseTeachers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Student[] getCourseStudentsArr(int courseId) {
+        List<Student> studentsList = new ArrayList<>();
+        try (Statement statement = this.connection.createStatement()) {
+
+            ResultSet rs = statement.executeQuery(String.format(GET_COURSE_STUDENTS_STATEMENT, courseId));
+            while (rs.next()) {
+                Student student = constructStudentObject(rs);
+                studentsList.add(student);
+            }
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsCourses.GetCourseStudentsFail.getMessage(), DbEventsCourses.GetCourseStudentsFail.getCode(),
+                    System.currentTimeMillis()));
+            getLogger().error(e.toString());
+        }
+
+        getLogger().info(InfoMessage.COURSE_GET_STUDENTS_SUCCESS + CURRENT_DB);
+        this.registerEvent(new Event(DbEventsCourses.GetCourseStudentsSuccess.getMessage(), DbEventsCourses.GetCourseStudentsSuccess.getCode(),
+                System.currentTimeMillis()));
+        return studentsList.toArray(new Student[studentsList.size()]);
+    }
+
+    @Override
+    public List<Student> getCourseStudentsList(int courseId) {
+        return Arrays.asList(this.getCourseStudentsArr(courseId));
     }
 }

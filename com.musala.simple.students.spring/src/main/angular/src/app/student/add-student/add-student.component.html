@@ -1,41 +1,52 @@
-<div class="container">
+<div class="row">
   <div>
     <toaster-container [toasterconfig]="config1"></toaster-container>
   </div>
   <form (ngSubmit)="onSubmit(form)" #form="ngForm" name="myForm" id="add-student-form">
 
-    <div class="form-group">
-      <label for="age">Id</label>
-      <input type="number" id="id" name="id" class="form-control" [ngModel]="defaultId" required #idCtrl="ngModel">
-      <span class="help-block" *ngIf="idCtrl.invalid && idCtrl.touched">Please enter student's id!</span>
+    <div class="form-group row">
+      <label for="age" class="col-sm-4 col-form-label">Id</label>
+      <div class="col-sm-8">
+        <input type="number" id="id" name="id" class="form-control" [ngModel]="defaultId" required #idCtrl="ngModel">
+        <span class="help-block" *ngIf="idCtrl.invalid && idCtrl.touched">Please enter student's id!</span>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" class="form-control" [ngModel]="defaultName" required #nameCtrl="ngModel">
+    <div class="form-group row">
+      <label for="name" class="col-sm-4 col-form-label">Name</label>
+      <div class="col-sm-8">
+        <input type="text" id="name" name="name" class="form-control" [ngModel]="defaultName" required #nameCtrl="ngModel">
       <span class="help-block" *ngIf="nameCtrl.invalid && nameCtrl.touched">Please enter student's name!</span>
     </div>
+    </div>
 
-    <div class="form-group">
-      <label for="age">Age</label>
-      <input type="number" id="age" name="age" class="form-control" [ngModel]="defaultAge" required #ageCtrl="ngModel">
+    <div class="form-group row">
+      <label for="age" class="col-sm-4 col-form-label">Age</label>
+      <div class="col-sm-8">
+        <input type="number" id="age" name="age" class="form-control" [ngModel]="defaultAge" required #ageCtrl="ngModel">
       <span class="help-block" *ngIf="ageCtrl.invalid && ageCtrl.touched">Please enter student's age!</span>
     </div>
-
-    <div class="form-group">
-      <label for="age">Grade</label>
-      <input type="number" id="grade" name="grade" class="form-control" [ngModel]="defaultGrade" required #gradeCtrl="ngModel">
-      <span class="help-block" *ngIf="gradeCtrl.invalid && gradeCtrl.touched">Please enter student's grade!</span>
     </div>
 
-    <div class="form-group">
-      <label for="dbType">Choose Database</label>
-      <select name="dbType" id="dbType" class="form-control" required [ngModel]="defaultDbType" #dbTypeCtrl="ngModel">
-        <option *ngFor="let option of availableDbs" [value]="option.value">
-          {{option.display}}
-        </option>
-      </select>
-      <span class="help-block" *ngIf="dbTypeCtrl.invalid && dbTypeCtrl.touched">Please select a database!</span>      
+    <div class="form-group row">
+      <label for="age" class="col-sm-4 col-form-label">Grade</label>
+      <div class="col-sm-8">
+        <input type="number" id="grade" name="grade" class="form-control" [ngModel]="defaultGrade" required #gradeCtrl="ngModel">
+      <span class="help-block" *ngIf="gradeCtrl.invalid && gradeCtrl.touched">Please enter student's grade!</span>
+    </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="dbType" class="col-sm-4 col-form-label">Choose Database</label>
+      <div class="col-sm-8">
+        <select name="dbType" id="dbType" class="form-control" required [ngModel]="defaultDbType" #dbTypeCtrl="ngModel">
+          <option *ngFor="let option of availableDbs" [value]="option.value">
+            {{option.display}}
+          </option>
+        </select>
+        <span class="help-block" *ngIf="dbTypeCtrl.invalid && dbTypeCtrl.touched">Please select a database!</span>
+      </div>
+      
     </div>
     <button class="btn btn-primary" id="add-student-submit" type="submit" [disabled]="form.invalid">Add Student</button>
   </form>

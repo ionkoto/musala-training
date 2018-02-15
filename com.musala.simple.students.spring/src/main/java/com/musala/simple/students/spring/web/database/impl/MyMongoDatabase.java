@@ -19,10 +19,12 @@ import com.musala.simple.students.spring.web.database.AbstractDatabase;
 import com.musala.simple.students.spring.web.database.DatabaseStudentCommands;
 import com.musala.simple.students.spring.web.dbevents.DbEventsStudents;
 import com.musala.simple.students.spring.web.dbevents.Event;
+import com.musala.simple.students.spring.web.exception.CourseNotFoundException;
 import com.musala.simple.students.spring.web.exception.StudentNotFoundException;
 import com.musala.simple.students.spring.web.exception.TeacherNotFoundException;
 import com.musala.simple.students.spring.web.internal.ErrorMessage;
 import com.musala.simple.students.spring.web.internal.InfoMessage;
+import com.musala.simple.students.spring.web.models.course.Course;
 import com.musala.simple.students.spring.web.models.student.Student;
 import com.musala.simple.students.spring.web.models.teacher.Teacher;
 
@@ -348,6 +350,66 @@ public class MyMongoDatabase extends AbstractDatabase {
 
     @Override
     public List<Teacher> getAllTeachersList() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean addCourse(Course course) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void addMultipleCourses(List<Course> courses) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addMultipleCourses(Course[] courses) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteCourseById(int courseId) throws CourseNotFoundException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Course getCourseById(int courseId) throws CourseNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Course[] getAllCoursesArr() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Course> getAllCoursesList() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Teacher> getCourseTeachers() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Student[] getCourseStudentsArr(int courseId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Student> getCourseStudentsList(int courseId) {
         // TODO Auto-generated method stub
         return null;
     }

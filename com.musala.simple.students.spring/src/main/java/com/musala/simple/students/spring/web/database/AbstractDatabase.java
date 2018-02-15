@@ -6,7 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.musala.simple.students.spring.web.dbevents.Event;
 import com.musala.simple.students.spring.web.dbevents.EventLogger;
 
-public abstract class AbstractDatabase implements DatabaseStudentCommands, DatabaseTeacherCommands, DatabaseProperties {
+public abstract class AbstractDatabase
+        implements DatabaseStudentCommands, DatabaseTeacherCommands, DatabaseCourseCommands, DatabaseProperties {
     private String name;
     private String host;
     private int port;
@@ -80,7 +81,6 @@ public abstract class AbstractDatabase implements DatabaseStudentCommands, Datab
      *
      */
     public abstract void establishConnection();
-    
 
     /**
      * Registers event to the static event logger to indicate the result

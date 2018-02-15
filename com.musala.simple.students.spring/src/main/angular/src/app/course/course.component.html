@@ -1,0 +1,32 @@
+<div *ngIf="isCourseLoaded" class='container profile-container'>
+  <div class='profile-info clearfix'>
+    <h4 class="text-center">
+      <strong>{{course.name}}</strong>
+    </h4>
+    <table class="table table-striped">
+        <thead>
+            <tr align="center" class="table-info">
+              <th scope="row" colspan="6">Students enrolled</th>
+            </tr>
+          </thead>
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Age</th>
+          <th scope="col">Grade</th>
+          <th scope="col" class="text-center" colspan="2">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="students" id='mysql-tbody'>
+        <tr *ngFor="let student of courseStudents" student-item [student]="student" student-item [dbType]="'mysql'"></tr>
+        <router-outlet></router-outlet>
+      </tbody>
+    </table>
+
+    <p>
+      <strong *ngIf='dbType == "mongo"'>Database: Mongo Db</strong>
+      <strong *ngIf='dbType == "mysql"'>Database: MySql</strong>
+    </p>
+  </div>
+</div>

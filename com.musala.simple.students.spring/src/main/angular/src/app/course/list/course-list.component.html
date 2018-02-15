@@ -1,0 +1,53 @@
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <form [formGroup]="myForm">
+    <div class="btn-group">
+      <label class="btn btn-primary" id="db-toggle-mongo" [class.active]="myForm.value.mongo" btnCheckbox formControlName="mongo">MongoDb</label>
+
+      <label class="btn btn-primary" id="db-toggle-mysql" [class.active]="myForm.value.mysql" btnCheckbox formControlName="mysql">MySql</label>
+    </div>
+  </form>
+</div>
+
+<div>
+  <toaster-container [toasterconfig]="config1"></toaster-container>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div *ngIf='mongoCoursesToShow.length > 0' id="mongo-courses-list" class="col-xs-6">
+      <h2>Mongo Db</h2>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Actions</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody class="courses" id='mongo-tbody'>
+          <tr *ngFor="let course of mongoCoursesToShow" course-item [course]="course" course-item [dbType]="'mongo'"></tr>
+          <router-outlet></router-outlet>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf='mysqlCoursesToShow.length > 0' id="mysql-courses-list" class="col-xs-6">
+      <h2>MySql Db</h2>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Actions</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody class="courses" id='mysql-tbody'>
+          <tr *ngFor="let course of mysqlCoursesToShow" course-item [course]="course" course-item [dbType]="'mysql'"></tr>
+          <router-outlet></router-outlet>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -2,7 +2,7 @@ import { StudentsPage } from './app.po';
 import { browser, element, by } from 'protractor';
 
 // slow down tests for better visualization
-//new StudentsPage().protractorSlowDownMs(1000);
+new StudentsPage().protractorSlowDownMs(500);
 const dbTypeMongo = "mongo";
 const dbTypeMysql = "mysql";
 

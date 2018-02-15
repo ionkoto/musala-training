@@ -18,6 +18,7 @@ public class ErrorMessage {
     public static final String NEGATIVE_ID = "The ID can't be a negative integer!";
     public static final String STUDENT_NOT_EXISTS = "A student with the given ID does not exist.";
     public static final String TEACHER_NOT_EXISTS = "A teacher with the given ID does not exist.";
+    public static final String COURSE_NOT_EXISTS = "A course with the given ID does not exist.";
     public static final String INVALID_ID_FORMAT = "The id must be a valid not-negative number!.";
     public static final String DATABASE_EMPTY = "The students database is currently empty.";
     public static final String DATABASE_CONNECTION_FAIL = "Cannot connect the database!";
