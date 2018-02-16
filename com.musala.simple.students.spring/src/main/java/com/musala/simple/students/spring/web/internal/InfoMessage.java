@@ -16,6 +16,7 @@ public class InfoMessage {
     public static final String TEACHER_GET_ALL_SUCCESS = "Successfully retrieved all the teachers from the database.";
     public static final String COURSE_GET_ALL_SUCCESS = "Successfully retrieved all the courses from the database.";
     public static final String COURSE_GET_STUDENTS_SUCCESS = "Successfully retrieved all students enrolled in this course";
+    public static final String COURSE_GET_TEACHERS_SUCCESS = "Successfully retrieved all teachers teaching in this course";
     public static final String DEFAULT_DATABASE_INITIALIZATION = "A valid database type was'n provided. A new Mongo Database will be initiliazed as a default option.";
 
     private InfoMessage() {

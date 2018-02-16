@@ -1,4 +1,5 @@
-<td *ngFor='let key of objectKeys(course)'>{{course[key]}}</td>
+<td>{{course.id}}</td>
+<td>{{course.name}}</td>
 <td>
   <button type="button" class="btn btn-primary details" routerLink="{{dbType}}/{{course.id}}/details">Details</button>
 </td>

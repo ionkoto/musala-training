@@ -96,6 +96,14 @@ export class CoursesService {
       .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
   }
 
+  getCourseTeachers(id, dbType): Observable<Object> {
+    return this.http.get(`http://localhost:1234/courses/${dbType}/${id}/teachers`)
+      .map((courseTeachers: Response) => {
+        return courseTeachers.json();
+      })
+      .catch((error: any) => Observable.throw(error.json().error || 'Server error'));
+  }
+
   deleteCourseById(id, dbType) {
     return this.http
       .delete(`http://localhost:1234/courses/delete/${id}/${dbType}`)

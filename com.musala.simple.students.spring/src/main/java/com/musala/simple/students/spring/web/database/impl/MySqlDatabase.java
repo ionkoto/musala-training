@@ -46,16 +46,19 @@ public class MySqlDatabase extends AbstractDatabase {
     private static final String GET_ALL_STUDENTS_STATEMENT = "SELECT * FROM students";
     private static final String GET_ALL_TEACHERS_STATEMENT = "SELECT * FROM teachers";
     private static final String GET_ALL_COURSES_STATEMENT = "SELECT * FROM courses";
-    private static final String INSERT_STUDENT_STATEMENT = 
-            "INSERT INTO students (" + " id," + " name," + " age, grade ) VALUES (" + "?, ?, ?, ?)";
-    private static final String INSERT_TEACHER_STATEMENT = 
-            "INSERT INTO teachers (" + " id," + " name," + " email ) VALUES (" + "?, ?, ?)";
-    private static final String INSERT_COURSE_STATEMENT = 
-            "INSERT INTO courses (" + " id," + " name ) VALUES (" + "?, ?)";
-    private static final String GET_COURSE_STUDENTS_STATEMENT = "SELECT s.id, s.name, s.age, s.grade " + 
-            "FROM students s, students_courses " + 
-            "WHERE students_courses.courseId_FK = %d " + 
-            "AND students_courses.sudentId_FK = s.id";
+    private static final String INSERT_STUDENT_STATEMENT = "INSERT INTO students (" + " id," + " name,"
+            + " age, grade ) VALUES (" + "?, ?, ?, ?)";
+    private static final String INSERT_TEACHER_STATEMENT = "INSERT INTO teachers (" + " id," + " name,"
+            + " email ) VALUES (" + "?, ?, ?)";
+    private static final String INSERT_COURSE_STATEMENT = "INSERT INTO courses (" + " id," + " name ) VALUES ("
+            + "?, ?)";
+    private static final String GET_COURSE_STUDENTS_STATEMENT = "SELECT s.id, s.name, s.age, s.grade "
+            + "FROM students s, students_courses " + "WHERE students_courses.courseId_FK = %d "
+            + "AND students_courses.studentId_FK = s.id";
+    private static final String GET_COURSE_TEACHERS_STATEMENT = "SELECT t.id, t.name, t.email "
+            + "FROM teachers t, teachers_courses " + "WHERE teachers_courses.courseId_FK = %d "
+            + "AND teachers_courses.teacherId_FK = t.id";
+
     private static final String DELETE_STUDENT_STATEMENT = "DELETE FROM students where id = ?";
     private static final String DELETE_TEACHER_STATEMENT = "DELETE FROM teachers where id = ?";
     private static final String DELETE_COURSE_STATEMENT = "DELETE FROM courses where id = ?";
@@ -76,8 +79,14 @@ public class MySqlDatabase extends AbstractDatabase {
             + " PRIMARY KEY ( id ))";
     private static final String CREATE_TEACHERS_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS teachers "
             + "(id INTEGER not NULL, " + " name VARCHAR(50), " + " email VARCHAR(50), " + " PRIMARY KEY ( id ))";
-    private static final String CREATE_COURSES_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS coarses "
+    private static final String CREATE_COURSES_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS courses "
             + "(id INTEGER not NULL, " + " name VARCHAR(50), " + " PRIMARY KEY ( id ))";
+    private static final String CREATE_STUDENTS_COURSES_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS students_courses "
+            + "(studentId_FK INTEGER not NULL, " + " courseId_FK INTEGER not NULL, "
+            + " PRIMARY KEY ( studentId_FK, courseId_FK ))";
+    private static final String CREATE_TEACHERS_COURSES_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS teachers_courses "
+            + "(teacherId_FK INTEGER not NULL, " + " courseId_FK INTEGER not NULL, "
+            + " PRIMARY KEY ( teacherId_FK, courseId_FK ))";
     private Connection connection;
     private static MySqlDatabase singleton;
 
@@ -111,15 +120,23 @@ public class MySqlDatabase extends AbstractDatabase {
             // create Table students if doesn't exist
             stmt = this.connection.prepareStatement(CREATE_STUDENTS_TABLE_STATEMENT);
             stmt.execute();
-            
-         // create Table teachers if doesn't exist
+
+            // create Table teachers if doesn't exist
             stmt = this.connection.prepareStatement(CREATE_TEACHERS_TABLE_STATEMENT);
             stmt.execute();
-            
-         // create Table courses if doesn't exist
+
+            // create Table courses if doesn't exist
             stmt = this.connection.prepareStatement(CREATE_COURSES_TABLE_STATEMENT);
             stmt.execute();
-            
+
+            // create Table students_courses if doesn't exist
+            stmt = this.connection.prepareStatement(CREATE_STUDENTS_COURSES_TABLE_STATEMENT);
+            stmt.execute();
+
+            // create Table teachers_courses if doesn't exist
+            stmt = this.connection.prepareStatement(CREATE_TEACHERS_COURSES_TABLE_STATEMENT);
+            stmt.execute();
+
             stmt.close();
             getLogger().info(InfoMessage.DATABASE_CONNECTION_SUCCESS + CURRENT_DB);
         } catch (SQLException e) {
@@ -147,8 +164,8 @@ public class MySqlDatabase extends AbstractDatabase {
 
             st.executeUpdate();
             st.close();
-            this.registerEvent(new Event(DbEventsStudents.AddStudentSuccessMySql.getMessage(), DbEventsStudents.AddStudentSuccessMySql.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsStudents.AddStudentSuccessMySql.getMessage(),
+                    DbEventsStudents.AddStudentSuccessMySql.getCode(), System.currentTimeMillis()));
             return true;
         } catch (SQLException e) {
 
@@ -158,8 +175,8 @@ public class MySqlDatabase extends AbstractDatabase {
                 getLogger().error(
                         String.format(STUDEND_ADD_FAIL_DUPLICATE_ID, student.getName(), student.getId()) + CURRENT_DB);
             } else {
-                this.registerEvent(new Event(DbEventsStudents.AddStudentFail.getMessage(), DbEventsStudents.AddStudentFail.getCode(),
-                        System.currentTimeMillis()));
+                this.registerEvent(new Event(DbEventsStudents.AddStudentFail.getMessage(),
+                        DbEventsStudents.AddStudentFail.getCode(), System.currentTimeMillis()));
                 getLogger().error(String.format(STUDENT_ADD_FAIL, student.getName(), student.getId()) + CURRENT_DB);
                 getLogger().error(e.toString());
             }
@@ -182,8 +199,8 @@ public class MySqlDatabase extends AbstractDatabase {
         for (Student student : students) {
             this.addStudent(student);
         }
-        this.registerEvent(new Event(DbEventsStudents.AddMultipleSuccess.getMessage(), DbEventsStudents.AddMultipleSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsStudents.AddMultipleSuccess.getMessage(),
+                DbEventsStudents.AddMultipleSuccess.getCode(), System.currentTimeMillis()));
     }
 
     /**
@@ -222,8 +239,8 @@ public class MySqlDatabase extends AbstractDatabase {
             this.registerEvent(new Event(DbEventsStudents.AddStudentSuccessMySql.getMessage(),
                     DbEventsStudents.AddStudentSuccessMySql.getCode(), System.currentTimeMillis()));
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsStudents.DeleteStudentFail.getMessage(), DbEventsStudents.DeleteStudentFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsStudents.DeleteStudentFail.getMessage(),
+                    DbEventsStudents.DeleteStudentFail.getCode(), System.currentTimeMillis()));
             getLogger().error(ErrorMessage.STUDENT_NOT_EXISTS + CURRENT_DB);
             getLogger().error(e.toString());
         }
@@ -252,13 +269,13 @@ public class MySqlDatabase extends AbstractDatabase {
                 throw new StudentNotFoundException(ErrorMessage.STUDENT_NOT_EXISTS + CURRENT_DB);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsStudents.GetStudentFail.getMessage(), DbEventsStudents.GetStudentFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsStudents.GetStudentFail.getMessage(),
+                    DbEventsStudents.GetStudentFail.getCode(), System.currentTimeMillis()));
             getLogger().error(String.format(STUDENT_GET_FAIL, sudentId) + CURRENT_DB);
             getLogger().error(e.toString());
         }
-        this.registerEvent(new Event(DbEventsStudents.GetStudentSuccess.getMessage(), DbEventsStudents.GetStudentsSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsStudents.GetStudentSuccess.getMessage(),
+                DbEventsStudents.GetStudentsSuccess.getCode(), System.currentTimeMillis()));
         return student;
     }
 
@@ -283,14 +300,14 @@ public class MySqlDatabase extends AbstractDatabase {
                 studentsList.add(student);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsStudents.GetStudentsFail.getMessage(), DbEventsStudents.GetStudentsFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsStudents.GetStudentsFail.getMessage(),
+                    DbEventsStudents.GetStudentsFail.getCode(), System.currentTimeMillis()));
             getLogger().error(e.toString());
         }
 
         getLogger().info(InfoMessage.STUDENT_GET_ALL_SUCCESS + CURRENT_DB);
-        this.registerEvent(new Event(DbEventsStudents.GetStudentsSuccess.getMessage(), DbEventsStudents.GetStudentsSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsStudents.GetStudentsSuccess.getMessage(),
+                DbEventsStudents.GetStudentsSuccess.getCode(), System.currentTimeMillis()));
         return studentsList.toArray(new Student[studentsList.size()]);
     }
 
@@ -344,8 +361,8 @@ public class MySqlDatabase extends AbstractDatabase {
 
             st.executeUpdate();
             st.close();
-            this.registerEvent(new Event(DbEventsTeachers.AddTeacherSuccessMySql.getMessage(), DbEventsTeachers.AddTeacherSuccessMySql.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsTeachers.AddTeacherSuccessMySql.getMessage(),
+                    DbEventsTeachers.AddTeacherSuccessMySql.getCode(), System.currentTimeMillis()));
             return true;
         } catch (SQLException e) {
 
@@ -355,8 +372,8 @@ public class MySqlDatabase extends AbstractDatabase {
                 getLogger().error(
                         String.format(TEACHER_ADD_FAIL_DUPLICATE_ID, teacher.getName(), teacher.getId()) + CURRENT_DB);
             } else {
-                this.registerEvent(new Event(DbEventsTeachers.AddTeacherFail.getMessage(), DbEventsTeachers.AddTeacherFail.getCode(),
-                        System.currentTimeMillis()));
+                this.registerEvent(new Event(DbEventsTeachers.AddTeacherFail.getMessage(),
+                        DbEventsTeachers.AddTeacherFail.getCode(), System.currentTimeMillis()));
                 getLogger().error(String.format(TEACHER_ADD_FAIL, teacher.getName(), teacher.getId()) + CURRENT_DB);
                 getLogger().error(e.toString());
             }
@@ -379,8 +396,8 @@ public class MySqlDatabase extends AbstractDatabase {
         for (Teacher teacher : teachers) {
             this.addTeacher(teacher);
         }
-        this.registerEvent(new Event(DbEventsTeachers.AddMultipleSuccess.getMessage(), DbEventsTeachers.AddMultipleSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsTeachers.AddMultipleSuccess.getMessage(),
+                DbEventsTeachers.AddMultipleSuccess.getCode(), System.currentTimeMillis()));
     }
 
     /**
@@ -419,8 +436,8 @@ public class MySqlDatabase extends AbstractDatabase {
             this.registerEvent(new Event(DbEventsTeachers.AddTeacherSuccessMySql.getMessage(),
                     DbEventsTeachers.AddTeacherSuccessMySql.getCode(), System.currentTimeMillis()));
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsTeachers.DeleteTeacherFail.getMessage(), DbEventsTeachers.DeleteTeacherFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsTeachers.DeleteTeacherFail.getMessage(),
+                    DbEventsTeachers.DeleteTeacherFail.getCode(), System.currentTimeMillis()));
             getLogger().error(ErrorMessage.TEACHER_NOT_EXISTS + CURRENT_DB);
             getLogger().error(e.toString());
         }
@@ -449,13 +466,13 @@ public class MySqlDatabase extends AbstractDatabase {
                 throw new TeacherNotFoundException(ErrorMessage.TEACHER_NOT_EXISTS + CURRENT_DB);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsTeachers.GetTeacherFail.getMessage(), DbEventsTeachers.GetTeacherFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsTeachers.GetTeacherFail.getMessage(),
+                    DbEventsTeachers.GetTeacherFail.getCode(), System.currentTimeMillis()));
             getLogger().error(String.format(TEACHER_GET_FAIL, teacherId) + CURRENT_DB);
             getLogger().error(e.toString());
         }
-        this.registerEvent(new Event(DbEventsTeachers.GetTeacherSuccess.getMessage(), DbEventsTeachers.GetTeachersSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsTeachers.GetTeacherSuccess.getMessage(),
+                DbEventsTeachers.GetTeachersSuccess.getCode(), System.currentTimeMillis()));
         return teacher;
     }
 
@@ -480,14 +497,14 @@ public class MySqlDatabase extends AbstractDatabase {
                 teachersList.add(teacher);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsTeachers.GetTeachersFail.getMessage(), DbEventsTeachers.GetTeachersFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsTeachers.GetTeachersFail.getMessage(),
+                    DbEventsTeachers.GetTeachersFail.getCode(), System.currentTimeMillis()));
             getLogger().error(e.toString());
         }
 
         getLogger().info(InfoMessage.TEACHER_GET_ALL_SUCCESS + CURRENT_DB);
-        this.registerEvent(new Event(DbEventsTeachers.GetTeachersSuccess.getMessage(), DbEventsTeachers.GetTeachersSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsTeachers.GetTeachersSuccess.getMessage(),
+                DbEventsTeachers.GetTeachersSuccess.getCode(), System.currentTimeMillis()));
         return teachersList.toArray(new Teacher[teachersList.size()]);
     }
 
@@ -503,7 +520,7 @@ public class MySqlDatabase extends AbstractDatabase {
     public List<Teacher> getAllTeachersList() {
         return Arrays.asList(this.getAllTeachersArr());
     }
-    
+
     /**
      * Casts all the values of the ResultSet to the corresponding data types and
      * passes them to the {@link Teacher} constructor to create a new object and
@@ -539,8 +556,8 @@ public class MySqlDatabase extends AbstractDatabase {
 
             st.executeUpdate();
             st.close();
-            this.registerEvent(new Event(DbEventsCourses.AddCourseSuccessMySql.getMessage(), DbEventsCourses.AddCourseSuccessMySql.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsCourses.AddCourseSuccessMySql.getMessage(),
+                    DbEventsCourses.AddCourseSuccessMySql.getCode(), System.currentTimeMillis()));
             return true;
         } catch (SQLException e) {
 
@@ -550,8 +567,8 @@ public class MySqlDatabase extends AbstractDatabase {
                 getLogger().error(
                         String.format(COURSE_ADD_FAIL_DUPLICATE_ID, course.getName(), course.getId()) + CURRENT_DB);
             } else {
-                this.registerEvent(new Event(DbEventsCourses.AddCourseFail.getMessage(), DbEventsCourses.AddCourseFail.getCode(),
-                        System.currentTimeMillis()));
+                this.registerEvent(new Event(DbEventsCourses.AddCourseFail.getMessage(),
+                        DbEventsCourses.AddCourseFail.getCode(), System.currentTimeMillis()));
                 getLogger().error(String.format(COURSE_ADD_FAIL, course.getName(), course.getId()) + CURRENT_DB);
                 getLogger().error(e.toString());
             }
@@ -574,8 +591,8 @@ public class MySqlDatabase extends AbstractDatabase {
         for (Course course : courses) {
             this.addCourse(course);
         }
-        this.registerEvent(new Event(DbEventsCourses.AddMultipleSuccess.getMessage(), DbEventsCourses.AddMultipleSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsCourses.AddMultipleSuccess.getMessage(),
+                DbEventsCourses.AddMultipleSuccess.getCode(), System.currentTimeMillis()));
     }
 
     /**
@@ -614,8 +631,8 @@ public class MySqlDatabase extends AbstractDatabase {
             this.registerEvent(new Event(DbEventsCourses.AddCourseSuccessMySql.getMessage(),
                     DbEventsCourses.AddCourseSuccessMySql.getCode(), System.currentTimeMillis()));
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsCourses.DeleteCourseFail.getMessage(), DbEventsCourses.DeleteCourseFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsCourses.DeleteCourseFail.getMessage(),
+                    DbEventsCourses.DeleteCourseFail.getCode(), System.currentTimeMillis()));
             getLogger().error(ErrorMessage.COURSE_NOT_EXISTS + CURRENT_DB);
             getLogger().error(e.toString());
         }
@@ -644,14 +661,16 @@ public class MySqlDatabase extends AbstractDatabase {
                 throw new CourseNotFoundException(ErrorMessage.COURSE_NOT_EXISTS + CURRENT_DB);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsCourses.GetCourseFail.getMessage(), DbEventsCourses.GetCourseFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsCourses.GetCourseFail.getMessage(),
+                    DbEventsCourses.GetCourseFail.getCode(), System.currentTimeMillis()));
             getLogger().error(String.format(COURSE_GET_FAIL, courseId) + CURRENT_DB);
             getLogger().error(e.toString());
         }
-        this.registerEvent(new Event(DbEventsCourses.GetCourseSuccess.getMessage(), DbEventsCourses.GetCoursesSuccess.getCode(),
-                System.currentTimeMillis()));
-        return course;
+        this.registerEvent(new Event(DbEventsCourses.GetCourseSuccess.getMessage(),
+                DbEventsCourses.GetCoursesSuccess.getCode(), System.currentTimeMillis()));
+        List<Teacher> teachersList = this.getCourseTeachersList(courseId);
+        List<Student> studentsList = this.getCourseStudentsList(courseId);
+        return new Course(course.getId(), course.getName(), studentsList, teachersList);
     }
 
     /**
@@ -675,14 +694,14 @@ public class MySqlDatabase extends AbstractDatabase {
                 coursesList.add(course);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsCourses.GetCoursesFail.getMessage(), DbEventsCourses.GetCoursesFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsCourses.GetCoursesFail.getMessage(),
+                    DbEventsCourses.GetCoursesFail.getCode(), System.currentTimeMillis()));
             getLogger().error(e.toString());
         }
 
         getLogger().info(InfoMessage.COURSE_GET_ALL_SUCCESS + CURRENT_DB);
-        this.registerEvent(new Event(DbEventsCourses.GetCoursesSuccess.getMessage(), DbEventsCourses.GetCoursesSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsCourses.GetCoursesSuccess.getMessage(),
+                DbEventsCourses.GetCoursesSuccess.getCode(), System.currentTimeMillis()));
         return coursesList.toArray(new Course[coursesList.size()]);
     }
 
@@ -698,7 +717,7 @@ public class MySqlDatabase extends AbstractDatabase {
     public List<Course> getAllCoursesList() {
         return Arrays.asList(this.getAllCoursesArr());
     }
-    
+
     /**
      * Casts all the values of the ResultSet to the corresponding data types and
      * passes them to the {@link Course} constructor to create a new object and
@@ -716,12 +735,6 @@ public class MySqlDatabase extends AbstractDatabase {
     }
 
     @Override
-    public List<Teacher> getCourseTeachers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Student[] getCourseStudentsArr(int courseId) {
         List<Student> studentsList = new ArrayList<>();
         try (Statement statement = this.connection.createStatement()) {
@@ -732,19 +745,46 @@ public class MySqlDatabase extends AbstractDatabase {
                 studentsList.add(student);
             }
         } catch (SQLException e) {
-            this.registerEvent(new Event(DbEventsCourses.GetCourseStudentsFail.getMessage(), DbEventsCourses.GetCourseStudentsFail.getCode(),
-                    System.currentTimeMillis()));
+            this.registerEvent(new Event(DbEventsCourses.GetCourseStudentsFail.getMessage(),
+                    DbEventsCourses.GetCourseStudentsFail.getCode(), System.currentTimeMillis()));
             getLogger().error(e.toString());
         }
 
         getLogger().info(InfoMessage.COURSE_GET_STUDENTS_SUCCESS + CURRENT_DB);
-        this.registerEvent(new Event(DbEventsCourses.GetCourseStudentsSuccess.getMessage(), DbEventsCourses.GetCourseStudentsSuccess.getCode(),
-                System.currentTimeMillis()));
+        this.registerEvent(new Event(DbEventsCourses.GetCourseStudentsSuccess.getMessage(),
+                DbEventsCourses.GetCourseStudentsSuccess.getCode(), System.currentTimeMillis()));
         return studentsList.toArray(new Student[studentsList.size()]);
     }
 
     @Override
     public List<Student> getCourseStudentsList(int courseId) {
         return Arrays.asList(this.getCourseStudentsArr(courseId));
+    }
+
+    @Override
+    public Teacher[] getCourseTeachersArr(int courseId) {
+        List<Teacher> teachersList = new ArrayList<>();
+        try (Statement statement = this.connection.createStatement()) {
+
+            ResultSet rs = statement.executeQuery(String.format(GET_COURSE_TEACHERS_STATEMENT, courseId));
+            while (rs.next()) {
+                Teacher teacher = constructTeacherObject(rs);
+                teachersList.add(teacher);
+            }
+        } catch (SQLException e) {
+            this.registerEvent(new Event(DbEventsCourses.GetCourseTeachersFail.getMessage(),
+                    DbEventsCourses.GetCourseTeachersFail.getCode(), System.currentTimeMillis()));
+            getLogger().error(e.toString());
+        }
+
+        getLogger().info(InfoMessage.COURSE_GET_TEACHERS_SUCCESS + CURRENT_DB);
+        this.registerEvent(new Event(DbEventsCourses.GetCourseTeachersSuccess.getMessage(),
+                DbEventsCourses.GetCourseTeachersSuccess.getCode(), System.currentTimeMillis()));
+        return teachersList.toArray(new Teacher[teachersList.size()]);
+    }
+
+    @Override
+    public List<Teacher> getCourseTeachersList(int courseId) {
+        return Arrays.asList(this.getCourseTeachersArr(courseId));
     }
 }

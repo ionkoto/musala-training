@@ -22,6 +22,7 @@ import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.helper.FileHelper;
 import com.musala.simple.students.spring.web.models.course.Course;
 import com.musala.simple.students.spring.web.models.student.Student;
+import com.musala.simple.students.spring.web.models.teacher.Teacher;
 
 /**
  * This is a Spring boot controller class annotated with @RestController
@@ -42,8 +43,7 @@ public class CoursesController {
 
     @PostMapping("courses/add/{dbType}")
     @CrossOrigin(origins = { "http://localhost:4200", "http://localhost:1234" })
-    public ResponseEntity<?> addCourseAjax(@Valid @RequestBody Course course,
-            @PathVariable("dbType") String dbType) {
+    public ResponseEntity<?> addCourseAjax(@Valid @RequestBody Course course, @PathVariable("dbType") String dbType) {
 
         boolean courseAddSuccess = false;
         switch (dbType) {
@@ -138,7 +138,7 @@ public class CoursesController {
         }
         return new ResponseEntity<>(success, HttpStatus.OK);
     }
-    
+
     @GetMapping("courses/{dbType}/{id}/students")
     @CrossOrigin(origins = "http://localhost:4200")
     public List<Student> showCourseStudents(@PathVariable("dbType") String dbType, @PathVariable("id") int courseId) {
@@ -159,5 +159,27 @@ public class CoursesController {
             return new ArrayList<>();
         }
         return courseStudents;
+    }
+
+    @GetMapping("courses/{dbType}/{id}/teachers")
+    @CrossOrigin(origins = "http://localhost:4200")
+    public List<Teacher> showCourseTeachers(@PathVariable("dbType") String dbType, @PathVariable("id") int courseId) {
+        List<Teacher> courseTeachers = null;
+
+        switch (dbType) {
+            case MONGO:
+                courseTeachers = CourseService.getCourseTeachers(DatabaseType.MongoDb, courseId);
+                break;
+            case MYSQL:
+                courseTeachers = CourseService.getCourseTeachers(DatabaseType.MySQL, courseId);
+                break;
+            default:
+                break;
+        }
+
+        if (courseTeachers == null) {
+            return new ArrayList<>();
+        }
+        return courseTeachers;
     }
 }

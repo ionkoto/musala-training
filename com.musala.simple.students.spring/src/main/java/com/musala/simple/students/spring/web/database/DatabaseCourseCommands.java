@@ -78,7 +78,9 @@ public interface DatabaseCourseCommands {
      */
     public List<Course> getAllCoursesList();
     
-    public List<Teacher> getCourseTeachers();
+    public Teacher[] getCourseTeachersArr(int courseId);
+    
+    public List<Teacher> getCourseTeachersList(int courseId);
     
     public Student[] getCourseStudentsArr(int courseId);
     

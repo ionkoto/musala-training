@@ -24,7 +24,9 @@ public enum DbEventsCourses {
     GetCoursesSuccess("Courses were loaded successfully!", "2.5"),
     GetCoursesFail("Couldn't load courses from DB", "1.6"),
     GetCourseStudentsSuccess("Course's students were loaded successfully!", "2.6"),
-    GetCourseStudentsFail("Couldn't load course's students from DB", "1.7");
+    GetCourseStudentsFail("Couldn't load course's students from DB", "1.7"),
+    GetCourseTeachersSuccess("Course's teachers were loaded successfully!", "2.7"),
+    GetCourseTeachersFail("Couldn't load course's teachers from DB", "1.8");
 
     private final String message;
     private final String code;

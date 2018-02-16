@@ -3,23 +3,51 @@
     <h4 class="text-center">
       <strong>{{course.name}}</strong>
     </h4>
+
     <table class="table table-striped">
-        <thead>
-            <tr align="center" class="table-info">
-              <th scope="row" colspan="6">Students enrolled</th>
-            </tr>
-          </thead>
+      <thead>
+        <tr align="center" class="table-info">
+          <th scope="row" colspan="6">Course Teachers</th>
+        </tr>
+      </thead>
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+        </tr>
+      </thead>
+      <tbody class="teachers" id='mysql-tbody'>
+        <tr *ngFor="let teacher of courseTeachers">
+          <td>{{teacher.id}}</td>
+          <td>{{teacher.name}}</td>
+          <td>{{teacher.email}}</td>
+        </tr>
+        <router-outlet></router-outlet>
+      </tbody>
+    </table>
+
+    <table class="table table-striped">
+      <thead>
+        <tr align="center" class="table-info">
+          <th scope="row" colspan="6">Students enrolled</th>
+        </tr>
+      </thead>
       <thead class="thead-dark">
         <tr>
           <th scope="col">Id</th>
           <th scope="col">Name</th>
           <th scope="col">Age</th>
           <th scope="col">Grade</th>
-          <th scope="col" class="text-center" colspan="2">Actions</th>
         </tr>
       </thead>
       <tbody class="students" id='mysql-tbody'>
-        <tr *ngFor="let student of courseStudents" student-item [student]="student" student-item [dbType]="'mysql'"></tr>
+        <tr *ngFor="let student of courseStudents">
+          <td>{{student.id}}</td>
+          <td>{{student.name}}</td>
+          <td>{{student.age}}</td>
+          <td>{{student.grade}}</td>
+        </tr>
         <router-outlet></router-outlet>
       </tbody>
     </table>

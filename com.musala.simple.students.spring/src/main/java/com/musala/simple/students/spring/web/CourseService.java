@@ -7,6 +7,7 @@ import com.musala.simple.students.spring.web.database.DatabaseType;
 import com.musala.simple.students.spring.web.exception.CourseNotFoundException;
 import com.musala.simple.students.spring.web.models.course.Course;
 import com.musala.simple.students.spring.web.models.student.Student;
+import com.musala.simple.students.spring.web.models.teacher.Teacher;
 
 /**
  * This is a Service class acting as a middle layer between REST endpoints and the database/backend,
@@ -15,10 +16,11 @@ import com.musala.simple.students.spring.web.models.student.Student;
  * @author yoan.petrushinov
  *
  */
-public class CourseService extends DbService{
+public class CourseService extends DbService {
 
-    private CourseService() {}
-    
+    private CourseService() {
+    }
+
     public static boolean addCourse(Course course, DatabaseType dbType) {
         switch (dbType) {
             case MySQL:
@@ -80,7 +82,7 @@ public class CourseService extends DbService{
                 return null;
         }
     }
-    
+
     public static List<Student> getCourseStudents(DatabaseType dbType, int courseId) {
         switch (dbType) {
             case MySQL:
@@ -88,7 +90,18 @@ public class CourseService extends DbService{
             case MongoDb:
                 return mongoDb.getCourseStudentsList(courseId);
             default:
-                return new ArrayList<Student>();
+                return new ArrayList<>();
+        }
+    }
+
+    public static List<Teacher> getCourseTeachers(DatabaseType dbType, int courseId) {
+        switch (dbType) {
+            case MySQL:
+                return mySqlDb.getCourseTeachersList(courseId);
+            case MongoDb:
+                return mongoDb.getCourseTeachersList(courseId);
+            default:
+                return new ArrayList<>();
         }
     }
 }

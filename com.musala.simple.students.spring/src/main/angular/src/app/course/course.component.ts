@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 import { CoursesService } from '../courses.service';
+import { StudentsService } from '../students.service';
 
 @Component({
   selector: 'app-course',
@@ -14,8 +15,10 @@ export class CourseComponent implements OnInit, OnDestroy {
   isCourseLoaded: boolean = false;
   id: number;
   courseStudents: any = [];
+  courseTeachers: any = [];
   coursesService: CoursesService;
   activatedRoute: ActivatedRoute;
+  mysqlChangeSubscription: Subscription;
   subscription: Subscription;
   dbType: String;
 
@@ -38,19 +41,9 @@ export class CourseComponent implements OnInit, OnDestroy {
       .subscribe(
       course => {
         this.course = course;
-
-        this.coursesService
-          .getCourseStudents(id, dbType)
-          .subscribe(
-            students => {
-              this.course["students"] = students;
-              this.courseStudents = students;
-              this.isCourseLoaded = true;
-              console.log(this.course);
-            },
-            err => {
-              console.log(err);
-            });
+        this.courseTeachers = course["courseTeachers"];
+        this.courseStudents = course["studentsEnrolled"];
+        this.isCourseLoaded = true;
       },
       err => {
         console.log(err);

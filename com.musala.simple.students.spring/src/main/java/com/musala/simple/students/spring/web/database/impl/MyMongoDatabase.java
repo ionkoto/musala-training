@@ -397,12 +397,6 @@ public class MyMongoDatabase extends AbstractDatabase {
     }
 
     @Override
-    public List<Teacher> getCourseTeachers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Student[] getCourseStudentsArr(int courseId) {
         // TODO Auto-generated method stub
         return null;
@@ -410,6 +404,18 @@ public class MyMongoDatabase extends AbstractDatabase {
 
     @Override
     public List<Student> getCourseStudentsList(int courseId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Teacher[] getCourseTeachersArr(int courseId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Teacher> getCourseTeachersList(int courseId) {
         // TODO Auto-generated method stub
         return null;
     }

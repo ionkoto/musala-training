@@ -1,6 +1,6 @@
 <td *ngFor='let key of objectKeys(student)'>{{student[key]}}</td>
 <td>
-  <button type="button" class="btn btn-primary details" routerLink="{{dbType}}/{{student.id}}/details">Details</button>
+  <button type="button" class="btn btn-primary details" routerLink="/students/{{dbType}}/{{student.id}}/details">Details</button>
 </td>
 <td>
   <button type="button" class="btn btn-danger delete" (click)="openModal(template)">Delete</button>
